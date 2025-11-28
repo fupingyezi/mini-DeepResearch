@@ -9,9 +9,22 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "@langchain/community": "^1.0.5",
+    "@langchain/core": "^1.0.5",
+    "@langchain/openai": "^1.1.1",
+    "@tavily/core": "^0.5.13",
+    "antd": "^5.29.1",
+    "dotenv": "^17.2.3",
+    "langchain": "^1.0.4",
     "next": "16.0.3",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "react-markdown": "^10.1.0",
+    "react-syntax-highlighter": "^16.1.0",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
