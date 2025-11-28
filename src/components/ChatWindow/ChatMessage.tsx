@@ -1,10 +1,16 @@
-import { ChatMessagesProps, ChatMessageBubbleProps } from "@/types";
-import React, { useRef, useEffect, useCallback } from "react";
+import Image from "next/image";
 import Markdown from "react-markdown";
-import { Spin } from "antd";
+import { Spin, Tooltip, message as antdMessage } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
+import { ChatMessagesProps, ChatMessageBubbleProps } from "@/types";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import copy from "copy-to-clipboard";
+
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
+  const [isShowOtherOperators, setIsShowOtherOperators] =
+    useState<boolean>(false);
+  const [showCopySuccess, setShowCopySuccess] = useState<boolean>(false);
   const renderContent = () => {
     if (typeof message.content === "string") {
       return message.content;
@@ -12,16 +18,93 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
     return JSON.stringify(message.content);
   };
 
+  useEffect(() => {
+    if (showCopySuccess) {
+      antdMessage.success("Copy Success!");
+      setShowCopySuccess(false);
+    }
+  }, [showCopySuccess]);
+
+  // 处理复制等其他操作
+  const renderAdditionalOperator = (role: string) => {
+    const userMessagesOperators: ("copy" | "edit")[] = ["copy", "edit"];
+    const aiMessagesOperators: ("copy" | "recall" | "download")[] = [
+      "copy",
+      "recall",
+      "download",
+    ];
+    const operatorToTextMap = (op: "copy" | "edit" | "recall" | "download") => {
+      switch (op) {
+        case "copy":
+          return "复制";
+        case "edit":
+          return "编辑";
+        case "recall":
+          return "重新生成";
+        case "download":
+          return "下载";
+      }
+    };
+
+    const handleOperator = (op: "copy" | "edit" | "recall" | "download") => {
+      switch (op) {
+        case "copy": {
+          copy(renderContent());
+          setShowCopySuccess(true);
+          return;
+        }
+      }
+    };
+
+    return (
+      <div
+        className={`absolute -bottom-10  flex transition-all  ${
+          role === "user" ? "justify-end" : "justify-start"
+        } ${isShowOtherOperators ? "opacity-100" : "opacity-0"}`}
+        onMouseEnter={() => setIsShowOtherOperators(true)}
+        onMouseLeave={() => setIsShowOtherOperators(false)}
+      >
+        {(role === "user" ? userMessagesOperators : aiMessagesOperators).map(
+          (op, index) => {
+            return (
+              <Tooltip
+                key={index}
+                title={`${operatorToTextMap(op)}`}
+                placement="bottom"
+              >
+                <Image
+                  src={`/${op}.svg`}
+                  alt={`${op}`}
+                  width={20}
+                  height={20}
+                  className="w-7 h-7 rounded-xl p-1 m-0.5 mb-2 hover:bg-[#e7e7e7] hover:cursor-pointer"
+                  onClick={() => handleOperator(op)}
+                ></Image>
+              </Tooltip>
+            );
+          }
+        )}
+      </div>
+    );
+  };
+
+  // user
   if (message.role === "user") {
     return (
-      <div className="w-full flex px-3 justify-end">
-        <div className="max-w-2/3 p-3 rounded-3xl bg-sky-100">
+      <div className="w-full px-3 mb-5 flex justify-end relative">
+        <div
+          className="max-w-2/3 p-3 rounded-3xl bg-sky-100"
+          onMouseEnter={() => setIsShowOtherOperators(true)}
+          onMouseLeave={() => setIsShowOtherOperators(false)}
+        >
           {renderContent()}
         </div>
+        {renderAdditionalOperator(message.role)}
       </div>
     );
   }
 
+  // loading
   if (
     message.role === "assistant" &&
     (message.content === "" ||
@@ -35,11 +118,17 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
     );
   }
 
+  // ai
   return (
-    <div className="w-full flex px-3 justify-start">
-      <div className="max-w-2/3 p-3 rounded-3xl bg-[#f4f4f4]">
+    <div className="w-full flex px-3 mb-5 justify-start flex-wrap relative">
+      <div
+        className="max-w-2/3 p-3 rounded-3xl bg-[#f4f4f4]"
+        onMouseEnter={() => setIsShowOtherOperators(true)}
+        onMouseLeave={() => setIsShowOtherOperators(false)}
+      >
         <Markdown>{renderContent()}</Markdown>
       </div>
+      {renderAdditionalOperator(message.role)}
     </div>
   );
 };

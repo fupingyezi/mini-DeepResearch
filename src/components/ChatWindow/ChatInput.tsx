@@ -37,7 +37,6 @@ const ChatInput: React.FC<ChatInputProps> = ({
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        disabled={disabled}
         rows={1}
         className="w-full px-3 py-2 border border-transparent rounded-md focus:outline-none resize-none overflow-y-auto scrollbar-hide"
         style={{
@@ -62,7 +61,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
         <button
           type="submit"
           disabled={!inputValue.trim() || disabled}
-          className="p-2 bg-[#000000] rounded-[50%] hover:cursor-pointer"
+          className={`p-2 rounded-[50%]  ${
+            !disabled
+              ? "bg-black hover:cursor-pointer"
+              : "bg-[#aeabab] hover:cursor-not-allowed"
+          }`}
         >
           <Image src="/send.svg" alt="发送" width={25} height={25}></Image>
         </button>
