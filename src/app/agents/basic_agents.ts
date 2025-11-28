@@ -1,9 +1,6 @@
-import { createAgent, tool } from "langchain";
+import { createAgent } from "langchain";
 import { ChatOpenAI } from "@langchain/openai";
-import * as z from "zod";
 import { BaseMessage } from "@langchain/core/messages";
-import { TavilySearchAPIRetriever } from "@langchain/community/retrievers/tavily_search_api";
-import { RunnableConfig } from "@langchain/core/runnables";
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env.local" });
