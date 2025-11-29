@@ -4,9 +4,10 @@ import type {
   ChatInputProps,
   ChatMessagesProps,
   ChatWindowProps,
-  ChatMessageType,
   chunkMessageType,
-} from "./ChatWindowRelatedDefine";
+} from "./chatWindowRelatedDefine";
+
+import type { ChatMessageType, ChatSessionType } from "./conversation";
 
 export {
   ChatLayoutProps,
@@ -14,6 +15,7 @@ export {
   ChatMessagesProps,
   ChatWindowProps,
   ChatInputProps,
-  ChatMessageType,
   chunkMessageType,
 };
+
+export { ChatMessageType, ChatSessionType };

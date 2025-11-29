@@ -21,7 +21,10 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   useEffect(() => {
     if (showCopySuccess) {
       antdMessage.success("Copy Success!");
-      setShowCopySuccess(false);
+      const timer = setTimeout(() => {
+        setShowCopySuccess(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [showCopySuccess]);
 

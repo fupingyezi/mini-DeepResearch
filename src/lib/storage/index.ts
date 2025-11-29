@@ -11,20 +11,34 @@ const minioClient = new Client({
 const BUCKET_NAME = process.env.MINIO_BUCKET!;
 
 async function ensureBucket() {
-  const bucketExists = await minioClient.bucketExists(BUCKET_NAME);
-  if (!bucketExists) {
-    await minioClient.makeBucket(BUCKET_NAME);
-    console.log(`Bucket ${BUCKET_NAME} created`);
+  try {
+    const bucketExists = await minioClient.bucketExists(BUCKET_NAME);
+    if (!bucketExists) {
+      await minioClient.makeBucket(BUCKET_NAME);
+      console.log(`Bucket ${BUCKET_NAME} created`);
+    } else {
+      console.log(`Bucket ${BUCKET_NAME} already exists`);
+    }
+  } catch (error) {
+    console.error("MinIO connection error:", error);
+    throw new Error(`Failed to connect to MinIO: ${error}`);
   }
 }
 
-ensureBucket().catch(console.error);
+let bucketInitialized = false;
+async function initializeBucket() {
+  if (!bucketInitialized) {
+    await ensureBucket();
+    bucketInitialized = true;
+  }
+}
 
 export async function uploadFile(
   fileName: string,
   buffer: Buffer,
   contentType?: string
 ) {
+  await initializeBucket();
   const objectName = `uploads/${Date.now()}-${fileName}`;
 
   await minioClient.putObject(

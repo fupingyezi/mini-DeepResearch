@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
+import { UUIDTypes } from "uuid";
+import { ChatMessageType } from "./conversation";
 
-export interface ChatMessageType {
-  id?: string;
-  role: string;
-  content: string | Record<string, string>;
-}
+// export interface ChatMessageType {
+//   id?: string;
+//   role: string;
+//   content: string | Record<string, string>;
+// }
 
 export interface chunkMessageType {
   type: "start" | "content" | "done" | "error";

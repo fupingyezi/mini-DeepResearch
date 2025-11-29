@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 
 const redis = createClient({
-  url: process.env.REDIS_URL || "redis://localhost:6379",
+  url: process.env.REDIS_URL,
 });
 
 redis.connect().catch(console.error);
@@ -17,7 +17,7 @@ redis.on("connect", () => {
 export async function setCache(
   key: string,
   value: string,
-  expireSeconds?: number
+  expireSeconds?: number //缓存时间
 ) {
   const stringValue = JSON.stringify(value);
   if (expireSeconds) {
