@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import SiderContent from "./SiderContent";
 
 const Sider = () => {
   const [isExpand, setIsExpand] = useState<boolean>(true);
@@ -23,8 +24,8 @@ const Sider = () => {
 
   return (
     <div
-      className={`h-screen  border-r-2 border-[#f3f3f3] transition-all ${
-        isExpand ? "w-[20%] bg-[#f9f9f9]" : "w-14 bg-white"
+      className={`h-screen flex flex-col  border-r-2 border-[#f3f3f3] transition-all ${
+        isExpand ? "w-[18%] bg-[#f9f9f9]" : "w-14 bg-white"
       }`}
     >
       <div className="flex items-center justify-between p-2">
@@ -50,6 +51,7 @@ const Sider = () => {
           />
         )}
       </div>
+      {isExpand && <SiderContent />}
     </div>
   );
 };
