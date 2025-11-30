@@ -60,7 +60,6 @@ class ApiClient {
   ): Promise<any> {
     const queryString = new URLSearchParams(params).toString();
     const url = queryString ? `${endpoint}?${queryString}` : endpoint;
-    console.log(url);
 
     return this.request(url, {
       method: "GET",

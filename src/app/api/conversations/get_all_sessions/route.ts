@@ -6,7 +6,7 @@ export async function GET() {
     const response = await query(
       "select * from chat_session order by updated_at DESC"
     );
-    console.log("query sessions response:", response);
+    // console.log("query sessions response:", response);
 
     return NextResponse.json(
       {

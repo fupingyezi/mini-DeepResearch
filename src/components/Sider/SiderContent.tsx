@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import { ChatSessionType, chunkMessageType } from "@/types";
 import apiClient from "@/utils/request/api";
 import { useConversationStore } from "@/store";
+import { UUIDTypes, v4 as uuidv4 } from "uuid";
 
 async function getConversationSessions() {
   try {
-    const data = await apiClient.get("/conversations/sessions");
-    console.log("initial sessions data:", data);
+    const data = await apiClient.get("/conversations/get_all_sessions");
     return data;
   } catch (error) {
     console.error("Failed to fetch conversation sessions:", error);
@@ -23,12 +23,25 @@ const SessionBubble: React.FC<{
   isShowDate: boolean;
 }> = ({ chatSession, isShowDate = false }) => {
   const [isHover, setIsHover] = useState<boolean>(false);
-  const { currentSession } = useConversationStore();
-  const testCurrentSession = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+  const { currentSession, setCurrentSession, setCurrentMessages } =
+    useConversationStore();
   const date = new Date(chatSession.updated_at);
   const showDate = `${date.getFullYear()}-${
     date.getMonth() + 1
   }-${date.getDay()}`;
+
+  const handleSelectSession = async (sessionId: UUIDTypes) => {
+    setCurrentSession(sessionId);
+    try {
+      const response = await apiClient.post(
+        "/conversations/get_current_messages",
+        { sessionId }
+      );
+      setCurrentMessages(response.data);
+    } catch (error) {
+      console.error("error:", error);
+    }
+  };
 
   return (
     <>
@@ -43,6 +56,7 @@ const SessionBubble: React.FC<{
         }}
         onMouseEnter={() => setIsHover(true)}
         onMouseLeave={() => setIsHover(false)}
+        onClick={() => handleSelectSession(chatSession.id)}
       >
         {chatSession.title}
         {isHover && (
@@ -70,7 +84,7 @@ const SessionBubble: React.FC<{
 
 const SiderContent = () => {
   const [sessions, setSessions] = useState<ChatSessionType[]>([]);
-  const { intialChatSessions } = useConversationStore();
+  const { intialChatSessions, chatSessions } = useConversationStore();
 
   const checkDifferentDay = (session: ChatSessionType, index: number) => {
     const date = new Date(session.updated_at);
@@ -100,7 +114,7 @@ const SiderContent = () => {
         <PlusCircleOutlined style={{ color: "black", fontSize: 20 }} />
         开启新对话
       </div>
-      <div className="w-[92%] h-4/5 overflow-y-scroll flex flex-col scrollbar-hide shadow-[inset_0_-16px_16px_-16px_rgba(0,0,0,0.1)]">
+      <div className="w-[92%] h-4/5 overflow-y-scroll flex flex-col scrollbar-hide">
         {sessions.map((session, index) => (
           <SessionBubble
             key={index}

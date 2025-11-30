@@ -1,14 +1,28 @@
 import { Pool } from "pg";
+import { ChatSessionType, ChatMessageType } from "@/types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-export const query = async (text: string, params?: any[]) => {
+export const query = async (
+  text: string,
+  params?: any[] | ChatMessageType | ChatSessionType
+) => {
   const client = await pool.connect();
+  let queryParams: any[] = [];
+
+  if (params) {
+    if (Array.isArray(params)) {
+      queryParams = params;
+    } else {
+      queryParams = Object.values(params);
+    }
+  }
+
   try {
-    const result = await client.query(text, params);
-    console.log("query result:", result);
+    const result = await client.query(text, queryParams);
+    // console.log("query result:", result);
     return result;
   } finally {
     client.release();
