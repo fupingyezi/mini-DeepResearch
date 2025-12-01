@@ -56,7 +56,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     // 没有对话，创建新对话
     if (!currentSession) {
       sessionId = uuidv4();
-      const now = new Date().toISOString();
       const chat_session: ChatSessionType = {
         id: sessionId,
         seq_id: chatSessions.length + 1,

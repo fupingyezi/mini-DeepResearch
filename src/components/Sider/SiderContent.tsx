@@ -83,26 +83,34 @@ const SessionBubble: React.FC<{
 };
 
 const SiderContent = () => {
-  const [sessions, setSessions] = useState<ChatSessionType[]>([]);
-  const { intialChatSessions, chatSessions } = useConversationStore();
+  const {
+    intialChatSessions,
+    chatSessions,
+    setCurrentSession,
+    setCurrentMessages,
+  } = useConversationStore();
 
   const checkDifferentDay = (session: ChatSessionType, index: number) => {
     const date = new Date(session.updated_at);
     const showDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
     let lastDate;
     if (index > 0) {
-      const date = new Date(sessions[index - 1].updated_at);
+      const date = new Date(chatSessions[index - 1].updated_at);
       lastDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
     }
 
     return index === 0 || showDate !== lastDate;
   };
 
+  const handleCreateNewSession = () => {
+    setCurrentMessages([]);
+    setCurrentSession("");
+  };
+
   useEffect(() => {
     const fetchSessions = async () => {
-      const data = await getConversationSessions();
-      setSessions(data.data || []);
-      intialChatSessions(data.data || []);
+      const response = await getConversationSessions();
+      intialChatSessions(response.data || []);
     };
 
     fetchSessions();
@@ -110,12 +118,15 @@ const SiderContent = () => {
 
   return (
     <div className="w-full flex h-full flex-col gap-6 items-center">
-      <div className="w-[92%] h-10 rounded-2xl flex justify-center gap-2 items-center cursor-pointer bg-white border border-transparent shadow-[0px_-2px_2px_rgba(72,104,178,0.04),0px_2px_2px_rgba(106,111,117,0.09),0px_1px_2px_rgba(72,104,178,0.08)] hover:shadow-[0_4px_4px_rgba(72,104,178,0.04),0_-3px_4px_rgba(72,104,178,0.04),0_6px_6px_rgba(106,111,117,0.1)]">
+      <div
+        className="w-[92%] h-10 rounded-2xl flex justify-center gap-2 items-center cursor-pointer bg-white border border-transparent shadow-[0px_-2px_2px_rgba(72,104,178,0.04),0px_2px_2px_rgba(106,111,117,0.09),0px_1px_2px_rgba(72,104,178,0.08)] hover:shadow-[0_4px_4px_rgba(72,104,178,0.04),0_-3px_4px_rgba(72,104,178,0.04),0_6px_6px_rgba(106,111,117,0.1)]"
+        onClick={() => handleCreateNewSession()}
+      >
         <PlusCircleOutlined style={{ color: "black", fontSize: 20 }} />
         开启新对话
       </div>
       <div className="w-[92%] h-4/5 overflow-y-scroll flex flex-col scrollbar-hide">
-        {sessions.map((session, index) => (
+        {chatSessions.map((session, index) => (
           <SessionBubble
             key={index}
             chatSession={session}

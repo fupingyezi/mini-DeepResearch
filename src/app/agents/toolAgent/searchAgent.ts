@@ -40,7 +40,7 @@ export const ChatAgentWithSearchTool = async (
   config?: Record<string, any>
 ) => {
   const model = new ChatOpenAI({
-    model: "qwen-plus",
+    model: "qwen-flash",
     apiKey: process.env.OPENAI_QWEN_API_KEY,
     configuration: {
       baseURL: process.env.OPENAI_QWEN_BASE_URL,

@@ -25,7 +25,7 @@ const useConversationStore = create<ConversationState>((set) => ({
     })),
   updateChatSessions: (chatSession) =>
     set((state) => ({
-      chatSessions: [...state.chatSessions, chatSession],
+      chatSessions: [chatSession, ...state.chatSessions],
     })),
   setCurrentSession: (sessionId) =>
     set(() => ({
