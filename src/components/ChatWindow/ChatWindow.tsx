@@ -105,14 +105,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setShouldAutoScroll(true);
 
     try {
-      const response = await fetch("/api/chat/basic_agents", {
+      const response = await fetch("/api/chat/v1/deep_research", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [...messages, newUserMessage],
-          stream: true,
+          input: inputValue,
+          sessionId: sessionId,
         }),
       });
 
@@ -139,8 +139,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             try {
               const data = JSON.parse(line.slice(6));
 
-              if (data.type === "content" && data.content) {
-                accumulatedContent += data.content;
+              if (data.type === "summary" && data.payload) {
+                accumulatedContent += data.payload;
                 const updateMessages = initialUpdateMessages.map((msg) =>
                   msg.id === assistantMessageId
                     ? { ...msg, content: accumulatedContent }

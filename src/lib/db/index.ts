@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { ChatSessionType, ChatMessageType } from "@/types";
+import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -28,6 +29,22 @@ export const query = async (
     client.release();
   }
 };
+
+let checkpointer: PostgresSaver | null = null;
+let isSetup = false;
+
+export async function getCheckpointer() {
+  if (!checkpointer) {
+    checkpointer = PostgresSaver.fromConnString(process.env.DATABASE_URL!);
+  }
+
+  if (!isSetup) {
+    await checkpointer.setup();
+    isSetup = true;
+  }
+
+  return checkpointer;
+}
 
 export const getClient = async () => {
   const client = await pool.connect();

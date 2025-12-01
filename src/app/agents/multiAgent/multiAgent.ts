@@ -395,7 +395,7 @@ function getRouteFromState(state: typeof StateAnnotation.State): string {
 
 //   .compile();
 
-const workflow = new StateGraph(StateAnnotation)
+const multiWorkflow = new StateGraph(StateAnnotation)
   .addNode("supervisorAgent", () => ({}))
   .addNode("taskDecomposerAgent", taskDecomposerAgent)
   .addNode("searchAgent", searchAgent)
@@ -500,4 +500,4 @@ const workflow = new StateGraph(StateAnnotation)
 // }
 
 // 导出工作流和测试函数
-export { workflow };
+export { multiWorkflow };
