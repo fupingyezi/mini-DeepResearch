@@ -17,6 +17,12 @@ importers:
       '@langchain/core':
         specifier: ^1.0.5
         version: 1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12))
+      '@langchain/langgraph':
+        specifier: ^1.0.2
+        version: 1.0.2(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod-to-json-schema@3.25.0(zod@4.1.12))(zod@4.1.12)
+      '@langchain/langgraph-checkpoint-postgres':
+        specifier: ^1.0.0
+        version: 1.0.0(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12)))(@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12))))
       '@langchain/openai':
         specifier: ^1.1.1
         version: 1.1.1(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12)))(ws@8.18.3)
@@ -668,6 +674,13 @@ packages:
   '@langchain/core@1.0.5':
     resolution: {integrity: sha512-9Hy/b9+j+mm0Bhnm8xD9B0KpBYTidroLrDHdbrHoMC2DqXoY2umvi1M3M/9D744qsMSaIMP0ZwFcy5YbqI/dGw==}
     engines: {node: '>=20'}
+
+  '@langchain/langgraph-checkpoint-postgres@1.0.0':
+    resolution: {integrity: sha512-oTHCbQ9N1Zki2J0B/ulq9g/t2DRPePeQqTTJQdMYkdhpHEuWBbEPhpybSTbtXHD/6iT/UImBkUaum+nmPCIJZw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@langchain/core': ^1.0.1
+      '@langchain/langgraph-checkpoint': ^1.0.0
 
   '@langchain/langgraph-checkpoint@1.0.0':
     resolution: {integrity: sha512-xrclBGvNCXDmi0Nz28t3vjpxSH6UYx6w5XAXSiiB1WEdc2xD2iY/a913I3x3a31XpInUW/GGfXXfePfaghV54A==}
@@ -3978,6 +3991,14 @@ snapshots:
       - '@opentelemetry/exporter-trace-otlp-proto'
       - '@opentelemetry/sdk-trace-base'
       - openai
+
+  '@langchain/langgraph-checkpoint-postgres@1.0.0(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12)))(@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12))))':
+    dependencies:
+      '@langchain/core': 1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12))
+      '@langchain/langgraph-checkpoint': 1.0.0(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12)))
+      pg: 8.16.3
+    transitivePeerDependencies:
+      - pg-native
 
   '@langchain/langgraph-checkpoint@1.0.0(@langchain/core@1.0.5(openai@6.9.0(ws@8.18.3)(zod@4.1.12)))':
     dependencies:

@@ -8,6 +8,7 @@ import type {
 } from "./chatWindowRelatedDefine";
 
 import type { ChatMessageType, ChatSessionType } from "./conversation";
+import type { taskType } from "./agentFlow";
 
 export {
   ChatLayoutProps,
@@ -19,3 +20,5 @@ export {
 };
 
 export { ChatMessageType, ChatSessionType };
+
+export { taskType };
