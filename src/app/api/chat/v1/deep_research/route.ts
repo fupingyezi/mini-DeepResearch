@@ -18,10 +18,16 @@ export async function POST(request: Request) {
     async start(controller) {
       try {
         for await (const state of await deepResearchWorkflow.stream(
-          { input, messages: [], tasks: [], summary: "" },
+          {
+            input: input,
+            messages: [],
+            tasks: [],
+            nextAction: "",
+            summary: "",
+          },
           { configurable: { thread_id: sessionId }, streamMode: "values" }
         )) {
-          console.log("state:", state);
+          // console.log("state:", state);
           const delta = extractDelta(lastState, state);
           console.log("delta:", delta);
           if (delta) {

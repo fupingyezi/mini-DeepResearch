@@ -1,8 +1,9 @@
 export interface taskType {
   id: string;
   description: string;
-  status: "pending" | "searched" | "processed";
+  status: "pending" | "searched" | "failed_attempt" | "processed";
   needSearch?: boolean;
   searchResult?: string[];
-  result?: string[];
+  result?: string;
+  feedback: string;
 }
