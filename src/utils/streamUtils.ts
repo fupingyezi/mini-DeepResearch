@@ -1,19 +1,20 @@
 import type { taskType } from "@/types";
 
-export function extractDelta(prevState: any, currentState: any) {
+export function handleStateUpdate(prevState: any, currentState: any) {
   const delta: Record<string, any> = {};
 
   if (
     currentState.tasks?.length &&
     (!prevState?.tasks || prevState.tasks.length === 0)
   ) {
-    delta.type = "tasks";
+    delta.type = "tasks_initial";
     delta.payload = currentState.tasks;
   } else if (currentState.tasks?.length && prevState?.tasks?.length) {
     const updatedTask = currentState.tasks.find(
-      (t: taskType) =>
-        t.status !==
-        prevState.tasks.find((pt: taskType) => pt.id === t.id)?.status
+      (task: taskType) =>
+        task.status !==
+        prevState.tasks.find((pretask: taskType) => pretask.id === task.id)
+          ?.status
     );
     if (updatedTask) {
       delta.type = "task_update";
@@ -27,4 +28,17 @@ export function extractDelta(prevState: any, currentState: any) {
   }
 
   return Object.keys(delta).length ? delta : null;
+}
+
+export function hanldeUpStore(data: any) {
+  if (!data.type || !data.payload) return;
+  if (data.type === "tasks_initial") {
+    
+  }
+  else if (data.type == "task_update") {
+
+  }
+  else {
+    
+  }
 }

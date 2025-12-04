@@ -20,6 +20,7 @@
     "antd": "^5.29.1",
     "copy-to-clipboard": "^3.3.3",
     "dotenv": "^17.2.3",
+    "immer": "^11.0.1",
     "langchain": "^1.0.4",
     "minio": "^8.0.6",
     "next": "^14.2.18",

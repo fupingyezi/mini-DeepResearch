@@ -1,5 +1,6 @@
 import "./globals.css";
 import Sider from "@/components/Sider/Sider";
+import DeepResearchProcess from "@/components/Process/DeepResearchProcess";
 
 export default async function RootLayout({
   children,
@@ -11,6 +12,7 @@ export default async function RootLayout({
       <body className="flex overflow-hidden">
         <Sider />
         {children}
+        <DeepResearchProcess />
       </body>
     </html>
   );

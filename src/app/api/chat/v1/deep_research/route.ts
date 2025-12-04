@@ -1,5 +1,5 @@
 import { createDeepResearchWorkflow } from "@/app/agents";
-import { extractDelta } from "@/utils/streamUtils";
+import { handleStateUpdate } from "@/utils/streamUtils";
 
 export async function POST(request: Request) {
   const { input, sessionId } = await request.json();
@@ -28,10 +28,10 @@ export async function POST(request: Request) {
           { configurable: { thread_id: sessionId }, streamMode: "values" }
         )) {
           // console.log("state:", state);
-          const delta = extractDelta(lastState, state);
-          console.log("delta:", delta);
-          if (delta) {
-            const message = `data: ${JSON.stringify(delta)}\n\n`;
+          const updateState = handleStateUpdate(lastState, state);
+          // console.log("delta:", delta);
+          if (updateState) {
+            const message = `data: ${JSON.stringify(updateState)}\n\n`;
             controller.enqueue(new TextEncoder().encode(message));
             lastState = state;
           }
