@@ -2,8 +2,12 @@ import type { taskType } from "@/types";
 
 export function handleStateUpdate(prevState: any, currentState: any) {
   const delta: Record<string, any> = {};
+  console.log("currentState:\n", currentState);
 
-  if (
+  if (currentState.simpleAnalysis && !prevState?.simpleAnalysis) {
+    (delta.type = "start_analyse"),
+      (delta.payload = currentState.simpleAnalysis);
+  } else if (
     currentState.tasks?.length &&
     (!prevState?.tasks || prevState.tasks.length === 0)
   ) {
@@ -28,17 +32,4 @@ export function handleStateUpdate(prevState: any, currentState: any) {
   }
 
   return Object.keys(delta).length ? delta : null;
-}
-
-export function hanldeUpStore(data: any) {
-  if (!data.type || !data.payload) return;
-  if (data.type === "tasks_initial") {
-    
-  }
-  else if (data.type == "task_update") {
-
-  }
-  else {
-    
-  }
 }

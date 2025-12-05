@@ -1,5 +1,6 @@
 import { ContentBlock } from "langchain";
 import { UUIDTypes } from "uuid";
+import { ConversationState, DeepResearchProcessState } from "@/store";
 
 export interface ChatMessageType {
   id: number;
@@ -18,4 +19,12 @@ export interface ChatSessionType {
   updated_at: number;
 }
 
+export interface chatWithChatAssistantProps extends ConversationState {
+  inputValue: string;
+}
 
+export interface chatWithDeepResearchProps
+  extends ConversationState,
+    DeepResearchProcessState {
+  inputValue: string;
+}

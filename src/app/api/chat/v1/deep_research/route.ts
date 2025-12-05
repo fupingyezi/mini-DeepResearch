@@ -20,6 +20,7 @@ export async function POST(request: Request) {
         for await (const state of await deepResearchWorkflow.stream(
           {
             input: input,
+            simpleAnalysis: "",
             messages: [],
             tasks: [],
             nextAction: "",

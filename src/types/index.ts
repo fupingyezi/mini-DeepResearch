@@ -7,7 +7,12 @@ import type {
   chunkMessageType,
 } from "./chatWindowRelatedDefine";
 
-import type { ChatMessageType, ChatSessionType } from "./conversation";
+import type {
+  ChatMessageType,
+  ChatSessionType,
+  chatWithChatAssistantProps,
+  chatWithDeepResearchProps,
+} from "./conversation";
 import type { taskType } from "./agentFlowRelatedDefine";
 
 export {
@@ -19,6 +24,11 @@ export {
   chunkMessageType,
 };
 
-export { ChatMessageType, ChatSessionType };
+export {
+  ChatMessageType,
+  ChatSessionType,
+  chatWithChatAssistantProps,
+  chatWithDeepResearchProps,
+};
 
 export { taskType };

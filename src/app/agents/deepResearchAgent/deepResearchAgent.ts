@@ -39,6 +39,7 @@ const searchWebTool = tool(
 
 const StateAnnotation = Annotation.Root({
   input: Annotation<string>(),
+  simpleAnalysis: Annotation<string>(),
   messages: Annotation<BaseMessage[]>({
     reducer: (x, y) => x.concat(y),
   }),
@@ -77,23 +78,27 @@ async function supervisor(state: typeof StateAnnotation.State) {
 原始用户问题：
 "${state.input}"
 
+是否进行了简单的分析：
+${state.simpleAnalysis ? "是" : "否"}
+
 当前任务状态：
 ${taskStatusSummary || "尚未拆解任务"}
 
 是否已经生成报告：
 ${state.summary ? "是" : "否"}
 
-请严格根据以下规则选择下一步，并仅输出一个 JSON 对象，不要包含任何其他文字、解释或 Markdown：
+请严格根据以下规则依次判断并选择下一步，并仅输出一个 JSON 对象，不要包含任何其他文字、解释或 Markdown：
 
+- 如果还没有简单的分析 → 输出 {"next": "analyse"}
 - 如果还没有任务列表 → 输出 {"next": "taskDecomposer"}
 - 如果有 pending 的任务 → 输出 {"next": "process"}
 - 如果所有任务都 processed 但 summary 为空 → 输出 {"next": "summarize"}
 - 如果 summary 已生成 → 输出 {"next": "end"}
 
-合法的 next 值只有：taskDecomposer, process, summarize, end
+合法的 next 值只有：analyse, taskDecomposer, process, summarize, end
 `;
 
-  // console.log("当前状态：\n", systemPrompt);
+  console.log("当前状态：\n", systemPrompt);
 
   // const supervisorAgent = createAgent({
   //   model: model,
@@ -128,6 +133,7 @@ ${state.summary ? "是" : "否"}
   }
 
   const nodeMap: Record<string, string> = {
+    analyse: "simpleAnalyse",
     taskDecomposer: "taskDecomposer",
     process: "taskHandler",
     summarize: "reportGenerationAssitant",
@@ -138,6 +144,42 @@ ${state.summary ? "是" : "否"}
   console.log("Supervisor 决策:", { next, nextAction });
 
   return { nextAction };
+}
+
+async function simpleAnalyse(state: typeof StateAnnotation.State) {
+  const model = new ChatOpenAI({
+    model: "qwen-flash",
+    apiKey: process.env.OPENAI_QWEN_API_KEY,
+    configuration: {
+      baseURL: process.env.OPENAI_QWEN_BASE_URL,
+    },
+    maxTokens: 200,
+    temperature: 0.1,
+  });
+
+  const systemPrompt = `
+  你是一个任务分析助手，在简单分析用户问题之后，
+  以深度研究助手的口吻，在50字以内生成一句开场白，格式为：“好的，下面我将研究……”，不展开具体分析。
+
+  用户问题:
+  ${state.input}
+`;
+
+  const agent = createAgent({
+    model: model,
+    systemPrompt: systemPrompt,
+  });
+
+  const response = await agent.invoke({
+    messages: `请输出开场白`,
+  });
+  const messages = response.messages;
+  const finalResult = messages[messages.length - 1].content;
+  // console.log("simpleAnalysis:", finalResult);
+
+  return {
+    simpleAnalysis: finalResult,
+  };
 }
 
 // 任务拆解子agent
@@ -311,6 +353,7 @@ async function createDeepResearchWorkflow() {
   const checkpointer = await getCheckpointer();
   const workflow = new StateGraph(StateAnnotation)
     .addNode("supervisor", supervisor)
+    .addNode("simpleAnalyse", simpleAnalyse)
     .addNode("taskDecomposer", taskDecomposer)
     .addNode("taskHandler", taskHandler)
     .addNode("reportGenerationAssitant", reportGenerationAssitant)
@@ -318,12 +361,14 @@ async function createDeepResearchWorkflow() {
     .addEdge(START, "supervisor")
 
     .addConditionalEdges("supervisor", (state) => state.nextAction, {
+      simpleAnalyse: "simpleAnalyse",
       taskDecomposer: "taskDecomposer",
       taskHandler: "taskHandler",
       reportGenerationAssitant: "reportGenerationAssitant",
       __end__: END,
     })
 
+    .addEdge("simpleAnalyse", "supervisor")
     .addEdge("taskDecomposer", "supervisor")
     .addEdge("taskHandler", "supervisor")
     .addEdge("reportGenerationAssitant", "supervisor")

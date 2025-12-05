@@ -6,6 +6,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { ChatMessagesProps, ChatMessageBubbleProps } from "@/types";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import copy from "copy-to-clipboard";
+import { useConversationStore } from "@/store";
 
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   const [isShowOtherOperators, setIsShowOtherOperators] =
