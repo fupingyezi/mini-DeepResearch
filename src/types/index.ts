@@ -13,7 +13,7 @@ import type {
   chatWithChatAssistantProps,
   chatWithDeepResearchProps,
 } from "./conversation";
-import type { taskType } from "./agentFlowRelatedDefine";
+import type { taskType, searchResultItem } from "./agentFlowRelatedDefine";
 
 export {
   ChatLayoutProps,
@@ -31,4 +31,4 @@ export {
   chatWithDeepResearchProps,
 };
 
-export { taskType };
+export { taskType, searchResultItem };

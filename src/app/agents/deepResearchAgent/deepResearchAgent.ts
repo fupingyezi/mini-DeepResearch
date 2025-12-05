@@ -5,6 +5,7 @@ import { ChatOpenAI } from "@langchain/openai";
 import { TavilySearchAPIRetriever } from "@langchain/community/retrievers/tavily_search_api";
 import type { taskType } from "@/types";
 import { getCheckpointer } from "@/lib";
+import { parseSearchResult } from "@/utils/streamUtils";
 
 import dotenv from "dotenv";
 
@@ -98,7 +99,7 @@ ${state.summary ? "是" : "否"}
 合法的 next 值只有：analyse, taskDecomposer, process, summarize, end
 `;
 
-  console.log("当前状态：\n", systemPrompt);
+  // console.log("当前状态：\n", systemPrompt);
 
   // const supervisorAgent = createAgent({
   //   model: model,
@@ -239,7 +240,7 @@ async function taskDecomposer(state: typeof StateAnnotation.State) {
         ...task,
         status: "pending",
         result: "",
-        searchResult: "",
+        searchResult: [],
       })
     );
     // console.log("解析的任务:", tasks);
@@ -294,6 +295,9 @@ async function taskHandler(state: typeof StateAnnotation.State) {
   });
   const messages = response.messages;
   const finalResult = messages[messages.length - 1].content;
+  console.log("message", messages);
+  const toolMessage = messages.find((msg) => msg._getType() === "tool");
+  console.log("toolMessage", toolMessage);
 
   return {
     tasks: [
@@ -301,7 +305,10 @@ async function taskHandler(state: typeof StateAnnotation.State) {
         ...tasksWaitProcess,
         status: "processed",
         result: finalResult,
-        searchResult: messages[messages.length - 2]?.content || "",
+        searchResult:
+          parseSearchResult(
+            toolMessage ? (toolMessage?.content as string) : ""
+          ) || [],
       },
     ],
   };

@@ -1,4 +1,4 @@
-import type { taskType } from "@/types";
+import type { taskType, searchResultItem } from "@/types";
 
 export function handleStateUpdate(prevState: any, currentState: any) {
   const delta: Record<string, any> = {};
@@ -32,4 +32,45 @@ export function handleStateUpdate(prevState: any, currentState: any) {
   }
 
   return Object.keys(delta).length ? delta : null;
+}
+
+export function parseSearchResult(searchResult: string): searchResultItem[] {
+  if (!searchResult.trim()) return [];
+
+  const rawBlocks = searchResult
+    .split(/\s*---\s*/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  const results: searchResultItem[] = [];
+
+  for (const block of rawBlocks) {
+    if (!block.includes("标题:")) continue;
+
+    const extractField = (label: string): string => {
+      const regex = new RegExp(`${label}:\\s*(.*?)(?=\\n|$)`, "s");
+      const match = block.match(regex);
+      return match ? match[1].trim() : "";
+    };
+
+    const title = extractField("标题");
+    const sourceUrl = extractField("来源");
+    let content = extractField("内容");
+    const scoreStr = extractField("相关性评分");
+
+    if (!content || content === "内容:") {
+      content = "";
+    }
+
+    const relativeScore = parseFloat(scoreStr) || 0;
+
+    results.push({
+      title,
+      sourceUrl,
+      content,
+      relativeScore,
+    });
+  }
+
+  return results;
 }
