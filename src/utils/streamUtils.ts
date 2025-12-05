@@ -2,7 +2,7 @@ import type { taskType, searchResultItem } from "@/types";
 
 export function handleStateUpdate(prevState: any, currentState: any) {
   const delta: Record<string, any> = {};
-  console.log("currentState:\n", currentState);
+  // console.log("currentState:\n", currentState);
 
   if (currentState.simpleAnalysis && !prevState?.simpleAnalysis) {
     (delta.type = "start_analyse"),

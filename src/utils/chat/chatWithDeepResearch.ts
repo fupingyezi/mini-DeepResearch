@@ -130,6 +130,7 @@ export const chatWithDeepResearch = async (
               setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
               if (data.type === "start_analyse")
                 setSimpleAnalysis(data.payload);
+              if (data.type === "summary") updateReport(data.payload);
             } else {
               if (data.type === "tasks_initial" && data.payload) {
                 initialTasks(data.payload);

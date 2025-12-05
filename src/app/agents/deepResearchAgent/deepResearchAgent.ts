@@ -295,9 +295,9 @@ async function taskHandler(state: typeof StateAnnotation.State) {
   });
   const messages = response.messages;
   const finalResult = messages[messages.length - 1].content;
-  console.log("message", messages);
+  // console.log("message", messages);
   const toolMessage = messages.find((msg) => msg._getType() === "tool");
-  console.log("toolMessage", toolMessage);
+  // console.log("toolMessage", toolMessage);
 
   return {
     tasks: [
