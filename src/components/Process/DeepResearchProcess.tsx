@@ -76,7 +76,9 @@ export const DeepResearchSearchProcessItem: React.FC<{
 };
 
 const DeepResearchProcess = () => {
-  const { simpleAnalysis, tasks, report } = useDeepResearchProcessStore();
+  const { isOpenProcessSider, simpleAnalysis, tasks, report } =
+    useDeepResearchProcessStore();
+  if (!isOpenProcessSider) return null;
 
   return (
     <div className="h-screen w-6xl px-4 py-2 flex flex-col overflow-y-scroll relative border-l-2 border-[#f3f3f3]">

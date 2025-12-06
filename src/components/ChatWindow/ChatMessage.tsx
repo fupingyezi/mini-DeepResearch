@@ -1,14 +1,20 @@
 import Image from "next/image";
 import Markdown from "react-markdown";
-import { Spin, Tooltip, message as antdMessage } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { Button, Spin, Tooltip, message as antdMessage } from "antd";
+import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 import { ChatMessagesProps, ChatMessageBubbleProps } from "@/types";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import copy from "copy-to-clipboard";
-import { useConversationStore } from "@/store";
+import {
+  useConversationStore,
+  useChatSelectStore,
+  useDeepResearchProcessStore,
+} from "@/store";
 
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
+  const { status } = useDeepResearchProcessStore();
+  const { selectedAgent } = useChatSelectStore();
   const [isShowOtherOperators, setIsShowOtherOperators] =
     useState<boolean>(false);
   const [showCopySuccess, setShowCopySuccess] = useState<boolean>(false);
@@ -126,11 +132,25 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   return (
     <div className="w-full flex px-3 mb-5 justify-start flex-wrap relative">
       <div
-        className="max-w-2/3 p-3 rounded-3xl bg-[#f4f4f4]"
+        className="max-w-2/3 p-3 rounded-3xl bg-white flex flex-col"
         onMouseEnter={() => setIsShowOtherOperators(true)}
         onMouseLeave={() => setIsShowOtherOperators(false)}
       >
         <Markdown>{renderContent()}</Markdown>
+        {status !== "notCall" && (
+          <Button className="h-4 w-2xs rounded-2xl">
+            {status === "processing" ? (
+              <>
+                <LoadingOutlined />
+                正在进行深度研究
+              </>
+            ) : (
+              <>
+                <CheckCircleOutlined style={{ color: "green" }} /> 深度研究完成
+              </>
+            )}
+          </Button>
+        )}
       </div>
       {renderAdditionalOperator(message.role)}
     </div>

@@ -11,6 +11,8 @@ export const chatWithDeepResearch = async (
 ) => {
   const {
     inputValue,
+    setStatus,
+    setIsOpenProcessSider,
     currentSession,
     chatSessions,
     currentMessages,
@@ -128,12 +130,18 @@ export const chatWithDeepResearch = async (
                   : msg
               );
               setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
-              if (data.type === "start_analyse")
+              if (data.type === "start_analyse") {
                 setSimpleAnalysis(data.payload);
-              if (data.type === "summary") updateReport(data.payload);
+                setStatus("processing");
+              }
+              if (data.type === "summary") {
+                updateReport(data.payload);
+                setStatus("end");
+              }
             } else {
               if (data.type === "tasks_initial" && data.payload) {
                 initialTasks(data.payload);
+                setIsOpenProcessSider(true);
               } else if (data.type === "task_update" && data.payload) {
                 updateTasks(data.payload);
               }
