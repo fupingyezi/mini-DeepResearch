@@ -40,6 +40,7 @@ const searchWebTool = tool(
 
 const StateAnnotation = Annotation.Root({
   input: Annotation<string>(),
+  researchTarget: Annotation<string>(),
   simpleAnalysis: Annotation<string>(),
   messages: Annotation<BaseMessage[]>({
     reducer: (x, y) => x.concat(y),
@@ -159,11 +160,18 @@ async function simpleAnalyse(state: typeof StateAnnotation.State) {
   });
 
   const systemPrompt = `
-  你是一个任务分析助手，在简单分析用户问题之后，
-  以深度研究助手的口吻，在50字以内生成一句开场白，格式为：“好的，下面我将研究……”，不展开具体分析。
+你是一个任务分析助手，在简单分析用户问题之后，完成以下两个任务：
+1. 以深度研究助手的视角，在8个字以内生成一个研究目标
+2. 以深度研究助手的口吻，在50字以内生成一句开场白，格式为：“好的，下面我将研究……”，不展开具体分析。
 
-  用户问题:
-  ${state.input}
+最终结果以：JSON格式
+{
+  "researchTarget": "研究目标",
+  "simpleAnalysis": "开场白"
+}返回，不得返回其他东西，不要包含任何解释、注释或 Markdown。
+
+用户问题:
+${state.input}
 `;
 
   const agent = createAgent({
@@ -172,15 +180,22 @@ async function simpleAnalyse(state: typeof StateAnnotation.State) {
   });
 
   const response = await agent.invoke({
-    messages: `请输出开场白`,
+    messages: "请输出符合要求的JSON。",
   });
-  const messages = response.messages;
-  const finalResult = messages[messages.length - 1].content;
-  // console.log("simpleAnalysis:", finalResult);
 
-  return {
-    simpleAnalysis: finalResult,
-  };
+  const rawContent = response.messages[response.messages.length - 1].content;
+
+  try {
+    const result = JSON.parse(rawContent as string);
+
+    return {
+      researchTarget: result.researchTarget.trim(),
+      simpleAnalysis: result.simpleAnalysis.trim(),
+    };
+  } catch (error) {
+    console.error("Failed to parse LLM response as JSON:", rawContent);
+    throw new Error(`LLM did not return valid JSON: ${rawContent}`);
+  }
 }
 
 // 任务拆解子agent

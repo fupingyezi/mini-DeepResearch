@@ -1,12 +1,14 @@
 import type { taskType, searchResultItem } from "@/types";
+import { de } from "zod/v4/locales";
 
 export function handleStateUpdate(prevState: any, currentState: any) {
   const delta: Record<string, any> = {};
   // console.log("currentState:\n", currentState);
 
   if (currentState.simpleAnalysis && !prevState?.simpleAnalysis) {
-    (delta.type = "start_analyse"),
-      (delta.payload = currentState.simpleAnalysis);
+    delta.type = "start_analyse";
+    delta.payload.simpleAnalysis = currentState.simpleAnalysis;
+    delta.payload.researchTarget = currentState.researchTarget;
   } else if (
     currentState.tasks?.length &&
     (!prevState?.tasks || prevState.tasks.length === 0)

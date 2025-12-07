@@ -7,12 +7,14 @@ export type processStatusType = "notCall" | "initial" | "processing" | "end";
 export interface DeepResearchProcessState {
   isOpenProcessSider: boolean;
   status: processStatusType;
+  researchTarget: string;
   simpleAnalysis: string;
   tasks: taskType[];
   report: string;
   setIsOpenProcessSider: (isOpenProcessSider: boolean) => void;
   setStatus: (status: processStatusType) => void;
   setSimpleAnalysis: (simpleAnalysis: string) => void;
+  setResearchTargt: (researchTarget: string) => void;
   initialTasks: (tasks: taskType[]) => void;
   setTasks: (tasks: taskType[]) => void;
   updateTasks: (task: taskType) => void;
@@ -23,6 +25,7 @@ const useDeepResearchProcessStore = create<DeepResearchProcessState>()(
   immer((set) => ({
     isOpenProcessSider: false,
     status: "notCall",
+    researchTarget: "",
     simpleAnalysis: "",
     tasks: [],
     report: "",
@@ -34,6 +37,10 @@ const useDeepResearchProcessStore = create<DeepResearchProcessState>()(
       set(() => ({
         status: status,
       })),
+    setResearchTargt: (researchTarget: string) =>
+      set((state) => {
+        state.researchTarget = researchTarget;
+      }),
     setSimpleAnalysis: (simpleAnalysis: string) =>
       set((state) => {
         state.simpleAnalysis = simpleAnalysis;

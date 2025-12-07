@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+type agentMode = "chat" | "search" | "deepResearch";
+
 export interface ChatSelectState {
   selectedAgent: string;
   setSelectedAgent: (selectedAgent: string) => void;

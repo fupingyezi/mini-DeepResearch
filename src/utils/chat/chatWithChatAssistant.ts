@@ -57,6 +57,7 @@ export const chatWithChatAssistant = async (
     sessionId: sessionId!,
     role: "user",
     content: inputValue,
+    mode: "chat",
   };
 
   const assistantMessageId = newUserMessage.id + 1;
@@ -70,6 +71,7 @@ export const chatWithChatAssistant = async (
       sessionId: sessionId!,
       role: "assistant",
       content: "",
+      mode: "chat",
     },
   ];
   setCurrentMessages(JSON.parse(JSON.stringify(initialUpdateMessages)));

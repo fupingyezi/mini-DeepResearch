@@ -5,6 +5,7 @@ import {
   ChatMessageType,
   chatWithDeepResearchProps,
 } from "@/types";
+import { deepResearchResultType } from "@/types/conversation";
 
 export const chatWithDeepResearch = async (
   chatWithDeepResearchParams: chatWithDeepResearchProps
@@ -21,6 +22,8 @@ export const chatWithDeepResearch = async (
     updateChatSessions,
     setCurrentSession,
     setCurrentMessages,
+    researchTarget,
+    setResearchTargt,
     simpleAnalysis,
     setSimpleAnalysis,
     tasks,
@@ -66,6 +69,7 @@ export const chatWithDeepResearch = async (
     sessionId: sessionId!,
     role: "user",
     content: inputValue,
+    mode: "deepResearch",
   };
 
   const assistantMessageId = newUserMessage.id + 1;
@@ -79,6 +83,7 @@ export const chatWithDeepResearch = async (
       sessionId: sessionId!,
       role: "assistant",
       content: "",
+      mode: "deepResearch",
     },
   ];
   setCurrentMessages(JSON.parse(JSON.stringify(initialUpdateMessages)));
@@ -123,18 +128,26 @@ export const chatWithDeepResearch = async (
               (data.type === "start_analyse" || data.type === "summary") &&
               data.payload
             ) {
-              accumulatedContent += data.payload;
-              const updateMessages = initialUpdateMessages.map((msg) =>
-                msg.id === assistantMessageId
-                  ? { ...msg, content: accumulatedContent }
-                  : msg
-              );
-              setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
               if (data.type === "start_analyse") {
-                setSimpleAnalysis(data.payload);
+                accumulatedContent += data.payload.simpleAnalysis;
+                const updateMessages = initialUpdateMessages.map((msg) =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, content: accumulatedContent }
+                    : msg
+                );
+                setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
+                setSimpleAnalysis(data.payload.simpleAnalysis);
+                setResearchTargt(data.payload.researchTarget);
                 setStatus("processing");
               }
               if (data.type === "summary") {
+                accumulatedContent += data.payload;
+                const updateMessages = initialUpdateMessages.map((msg) =>
+                  msg.id === assistantMessageId
+                    ? { ...msg, content: accumulatedContent }
+                    : msg
+                );
+                setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
                 updateReport(data.payload);
                 setStatus("end");
               }
@@ -175,6 +188,13 @@ export const chatWithDeepResearch = async (
     setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
   } finally {
     setIsLoading(false);
+    const deepResearchResult: deepResearchResultType = {
+      messageId: assistantMessageId,
+      sessionId: sessionId,
+      researchTarget: researchTarget,
+      tasks: tasks,
+      report: report,
+    };
     const new_Messages = [
       newUserMessage,
       {
@@ -182,7 +202,9 @@ export const chatWithDeepResearch = async (
         sessionId: sessionId!,
         role: "assistant",
         content: accumulatedContent || "出错了，哎嘿。",
-      },
+        mode: "deepResearch",
+        deepResearchResult: deepResearchResult,
+      } as ChatMessageType,
     ];
     try {
       const response = await apiClient.post("/conversations/update_messages", {
