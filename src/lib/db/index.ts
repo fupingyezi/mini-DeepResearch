@@ -70,13 +70,20 @@ export async function initialDB() {
         id integer not null,
         session_id uuid not null references chat_session(id) on delete cascade,
         role varchar(50) not null,
-        content jsonb not null,
+        content text not null,
         file_count integer default 0,
         accumulated_token_usage integer default 0,
         mode varchar(20) not null default 'chat' check (mode in ('chat', 'search', 'deepResearch')),
+        research_status varchar(20) not null default 'failed' check (research_status in ('processing', 'suspended', 'finished', 'failed')),
         created_at timestamp with time zone default current_timestamp,
         primary key (session_id, id)
       );
+    `);
+
+    // 修改现有表的 content 字段类型（如果表已存在）
+    await query(`
+      ALTER TABLE chat_message 
+      ALTER COLUMN content TYPE text;
     `);
 
     // 3. deep_research_result

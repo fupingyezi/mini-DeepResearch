@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     `;
 
     const response = await query(queryText, [sessionId]);
-    // console.log("query messages response:", response);
+    console.log("query messages response:", response);
 
     return NextResponse.json(
       {

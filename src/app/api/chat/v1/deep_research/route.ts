@@ -26,7 +26,11 @@ export async function POST(request: Request) {
             nextAction: "",
             summary: "",
           },
-          { configurable: { thread_id: sessionId }, streamMode: "values" }
+          {
+            configurable: { thread_id: sessionId },
+            streamMode: "values",
+            recursionLimit: 200,
+          }
         )) {
           // console.log("state:", state);
           const updateState = handleStateUpdate(lastState, state);

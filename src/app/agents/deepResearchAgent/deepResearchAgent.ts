@@ -184,9 +184,11 @@ ${state.input}
   });
 
   const rawContent = response.messages[response.messages.length - 1].content;
+  // console.log("row simpleAnalysis result:", rawContent);
 
   try {
     const result = JSON.parse(rawContent as string);
+    // console.log("parse result:", result);
 
     return {
       researchTarget: result.researchTarget.trim(),

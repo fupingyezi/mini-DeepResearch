@@ -3,7 +3,7 @@
 import { PlusCircleOutlined, EllipsisOutlined } from "@ant-design/icons";
 
 import { useEffect, useState } from "react";
-import { ChatSessionType, chunkMessageType } from "@/types";
+import { ChatMessageType, ChatSessionType, chunkMessageType } from "@/types";
 import apiClient from "@/utils/request/api";
 import { useConversationStore } from "@/store";
 import { UUIDTypes, v4 as uuidv4 } from "uuid";
@@ -37,7 +37,18 @@ const SessionBubble: React.FC<{
         "/conversations/get_current_messages",
         { sessionId }
       );
-      setCurrentMessages(response.data);
+      console.log(response.data);
+      const messages = response.data.map((msg: any) => {
+        return {
+          id: msg.id,
+          sessionId: msg.session_id,
+          role: msg.role,
+          content: msg.content,
+          mode: msg.mode,
+          researchStatus: msg.research_status,
+        } as ChatMessageType;
+      });
+      setCurrentMessages(messages);
     } catch (error) {
       console.error("error:", error);
     }

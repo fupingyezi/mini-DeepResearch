@@ -6,6 +6,7 @@ import {
   chatWithDeepResearchProps,
 } from "@/types";
 import { deepResearchResultType } from "@/types/conversation";
+import useDeepResearchProcessStore from "@/store/deepResearchProcessStore";
 
 export const chatWithDeepResearch = async (
   chatWithDeepResearchParams: chatWithDeepResearchProps
@@ -22,12 +23,8 @@ export const chatWithDeepResearch = async (
     updateChatSessions,
     setCurrentSession,
     setCurrentMessages,
-    researchTarget,
     setResearchTargt,
-    simpleAnalysis,
     setSimpleAnalysis,
-    tasks,
-    report,
     initialTasks,
     updateTasks,
     updateReport,
@@ -36,6 +33,7 @@ export const chatWithDeepResearch = async (
   if (inputValue === "") return;
 
   let sessionId = currentSession;
+  let finalStatus = "failed";
   // 没有对话，创建新对话
   if (!currentSession) {
     sessionId = uuidv4();
@@ -84,7 +82,7 @@ export const chatWithDeepResearch = async (
       role: "assistant",
       content: "",
       mode: "deepResearch",
-    },
+    } as ChatMessageType,
   ];
   setCurrentMessages(JSON.parse(JSON.stringify(initialUpdateMessages)));
   setShouldAutoScroll(true);
@@ -132,7 +130,11 @@ export const chatWithDeepResearch = async (
                 accumulatedContent += data.payload.simpleAnalysis;
                 const updateMessages = initialUpdateMessages.map((msg) =>
                   msg.id === assistantMessageId
-                    ? { ...msg, content: accumulatedContent }
+                    ? {
+                        ...msg,
+                        content: accumulatedContent,
+                        researchStatus: "processing",
+                      }
                     : msg
                 );
                 setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
@@ -150,6 +152,7 @@ export const chatWithDeepResearch = async (
                 setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
                 updateReport(data.payload);
                 setStatus("end");
+                finalStatus = "finished";
               }
             } else {
               if (data.type === "tasks_initial" && data.payload) {
@@ -182,19 +185,28 @@ export const chatWithDeepResearch = async (
 
     const updateMessages = initialUpdateMessages.map((msg) =>
       msg.id === assistantMessageId
-        ? { ...msg, content: "出错了，哎嘿。" }
+        ? { ...msg, content: "出错了，哎嘿。", researchStatus: "failed" }
         : msg
     );
+    finalStatus = "failed";
     setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
   } finally {
     setIsLoading(false);
+    const currentState = useDeepResearchProcessStore.getState();
+
+    const tasksWithUuid = (currentState.tasks || []).map((task) => ({
+      ...task,
+      taskId: task.taskId || uuidv4(),
+    }));
+
     const deepResearchResult: deepResearchResultType = {
       messageId: assistantMessageId,
-      sessionId: sessionId,
-      researchTarget: researchTarget,
-      tasks: tasks,
-      report: report,
+      sessionId: sessionId!,
+      researchTarget: currentState.researchTarget || "",
+      tasks: tasksWithUuid,
+      report: currentState.report || "",
     };
+
     const new_Messages = [
       newUserMessage,
       {
@@ -204,6 +216,7 @@ export const chatWithDeepResearch = async (
         content: accumulatedContent || "出错了，哎嘿。",
         mode: "deepResearch",
         deepResearchResult: deepResearchResult,
+        researchStatus: finalStatus,
       } as ChatMessageType,
     ];
     try {

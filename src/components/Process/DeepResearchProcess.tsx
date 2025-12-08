@@ -48,6 +48,7 @@ export const DeepResearchSearchProcessItem: React.FC<{
                 const displayTitle = item.title || "未命名页面";
                 return (
                   <a
+                    key={idx}
                     href={item.sourceUrl}
                     target="_blank"
                     title={`来源: ${item.sourceUrl}`}
@@ -76,7 +77,7 @@ export const DeepResearchSearchProcessItem: React.FC<{
 };
 
 const DeepResearchProcess = () => {
-  const { isOpenProcessSider, simpleAnalysis, tasks, report } =
+  const { isOpenProcessSider, researchTarget, tasks, report } =
     useDeepResearchProcessStore();
   if (!isOpenProcessSider) return null;
 
@@ -84,7 +85,7 @@ const DeepResearchProcess = () => {
     <div className="h-screen w-6xl px-4 py-2 flex flex-col overflow-y-scroll relative border-l-2 border-[#f3f3f3]">
       {/* header */}
       <div className="w-full sticky flex justify-between items-center">
-        <div className="w-[70%]">{simpleAnalysis}</div>
+        <div className="w-[70%]">{researchTarget}</div>
         <Image src="/close.svg" width={30} height={30} alt="关闭"></Image>
       </div>
 
@@ -122,6 +123,7 @@ const DeepResearchProcess = () => {
         <div className="w-full flex flex-col">
           {tasks.map((task, index) => (
             <DeepResearchSearchProcessItem
+              key={task.id}
               task={task}
               isShow={index === 0 || tasks[index - 1].result !== ""}
             />

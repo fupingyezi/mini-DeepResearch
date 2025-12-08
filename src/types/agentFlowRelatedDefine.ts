@@ -6,7 +6,8 @@ export interface searchResultItem {
 }
 
 export interface taskType {
-  id: string;
+  id: string; // AI生成的步骤标识，如 "step1_understand_ecma"
+  taskId?: string; // 数据库用的UUID
   description: string;
   // status: "pending" | "searched" | "failed_attempt" | "processed";
   status: string;

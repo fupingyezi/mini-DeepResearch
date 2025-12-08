@@ -12,6 +12,7 @@ export interface ChatMessageType {
   files?: any[];
   accumulatedTokenUsage?: number;
   deepResearchResult?: deepResearchResultType;
+  researchStatus?: "finished" | "failed";
 }
 
 export interface deepResearchResultType {

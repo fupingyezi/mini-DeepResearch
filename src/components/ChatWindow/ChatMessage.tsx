@@ -5,6 +5,7 @@ import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 import { ChatMessagesProps, ChatMessageBubbleProps } from "@/types";
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import apiClient from "@/utils/request/api";
 import copy from "copy-to-clipboard";
 import {
   useConversationStore,
@@ -105,8 +106,14 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   };
 
   // 点击查看深度研究结果的处理逻辑
-  const hanldeShowDeepResearch = () => {
-    const deepResearchResult = message.deepResearchResult;
+  const hanldeShowDeepResearch = async () => {
+    if (status === "processing") return;
+    const response = await apiClient.post(
+      "/conversations/get_deep_research_result",
+      { session_id: message.sessionId, message_id: message.id }
+    );
+    console.log("deepResearchResult:", response);
+    const deepResearchResult = response.data;
     if (!deepResearchResult) {
       console.error("出错了，没有研究结果");
       return;
@@ -120,13 +127,21 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
 
   // 深度研究状态显示框展示逻辑
   const renderShowDeepResearch = () => {
-    if (message.mode === "deepResearch" && message.deepResearchResult) {
+    if (
+      message.mode !== "deepResearch" ||
+      message.role !== "assistant" ||
+      message.researchStatus === "failed"
+    ) {
+      return null;
+    }
+
+    if (message.researchStatus === "finished") {
       return (
-        <Button className="h-4 w-2xs rounded-2xl">
-          <CheckCircleOutlined
-            onClick={() => hanldeShowDeepResearch()}
-            style={{ color: "green" }}
-          />{" "}
+        <Button
+          className="h-4 w-2xs rounded-2xl"
+          onClick={() => hanldeShowDeepResearch()}
+        >
+          <CheckCircleOutlined style={{ color: "green" }} />{" "}
           深度研究完成,查看结果
         </Button>
       );
@@ -138,7 +153,10 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
       status !== "notCall"
     ) {
       return (
-        <Button className="h-4 w-2xs rounded-2xl">
+        <Button
+          className="h-4 w-2xs rounded-2xl"
+          onClick={() => hanldeShowDeepResearch()}
+        >
           {status === "processing" ? (
             <>
               <LoadingOutlined />
@@ -146,10 +164,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             </>
           ) : (
             <>
-              <CheckCircleOutlined
-                onClick={() => hanldeShowDeepResearch()}
-                style={{ color: "green" }}
-              />{" "}
+              <CheckCircleOutlined style={{ color: "green" }} />{" "}
               深度研究完成,查看结果
             </>
           )}

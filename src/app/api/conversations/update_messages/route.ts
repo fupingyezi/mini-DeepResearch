@@ -25,24 +25,42 @@ export async function POST(request: NextRequest) {
             content,
             file_count,
             accumulated_token_usage,
-            mode
-          ) values ($1, $2, $3, $4, $5, $6, $7);
+            mode,
+            research_status
+          ) values ($1, $2, $3, $4, $5, $6, $7, $8);
         `;
+
+        const contentString =
+          typeof message.content === "string"
+            ? message.content
+            : JSON.stringify(message.content);
 
         const msgValues = [
           message.id,
           message.sessionId,
           message.role,
-          message.content,
+          contentString,
           message.files?.length || 0,
           message.accumulatedTokenUsage || 0,
           message.mode || "chat",
+          message.researchStatus || "failed",
         ];
+        // console.log(msgValues);
 
         await client.query(insertMsgQuery, msgValues);
+        console.log("message:", message);
 
-        if (message.mode === "deepResearch" && message.deepResearchResult) {
+        if (
+          message.mode === "deepResearch" &&
+          message.researchStatus === "finished"
+        ) {
           const dr = message.deepResearchResult;
+          console.log("dr", dr);
+
+          const cleanResearchTarget = (dr.researchTarget || "")
+            .toString()
+            .trim();
+          const cleanReport = (dr.report || "").toString().trim();
 
           // 插入 deep_research_result
           const insertDRQuery = `
@@ -54,32 +72,36 @@ export async function POST(request: NextRequest) {
           const drRes = await client.query(insertDRQuery, [
             message.sessionId,
             message.id,
-            dr.researchTarget,
-            dr.report || "",
+            cleanResearchTarget,
+            cleanReport,
           ]);
 
           const researchResultId = drRes.rows[0].id;
 
           // 插入对应的每个 task
           for (const task of dr.tasks || []) {
+            const cleanDescription = (task.description || "").toString().trim();
+            const cleanResult = task.result
+              ? task.result.toString().trim()
+              : null;
+
             const insertTaskQuery = `
               insert into research_task (
                 id,
                 research_result_id,
                 description,
-                status,
                 need_search,
                 result
-              ) values ($1, $2, $3, $4, $5, $6);
+              ) values ($1, $2, $3, $4, $5);
             `;
 
+            const taskUuid = task.taskId;
             await client.query(insertTaskQuery, [
-              task.id,
+              taskUuid,
               researchResultId,
-              task.description,
-              task.status || "completed",
+              cleanDescription,
               !!task.needSearch,
-              task.result || null,
+              cleanResult,
             ]);
 
             // 插入该 task 的搜索结果
@@ -95,7 +117,7 @@ export async function POST(request: NextRequest) {
               `;
 
               await client.query(insertSRQuery, [
-                task.id,
+                taskUuid, // 使用同样的 UUID
                 sr.title || null,
                 sr.sourceUrl || null,
                 sr.content || null,
