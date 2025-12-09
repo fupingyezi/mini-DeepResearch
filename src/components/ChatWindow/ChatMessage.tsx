@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button, Spin, Tooltip, message as antdMessage } from "antd";
 import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
@@ -143,7 +144,9 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             深度研究完成,查看研究过程
           </Button>
           <div>
-            <Markdown>{message.deepResearchResult?.report}</Markdown>
+            <Markdown remarkPlugins={[remarkGfm]}>
+              {message.deepResearchResult?.report}
+            </Markdown>
           </div>
         </>
       );
@@ -267,7 +270,17 @@ const ChatMessage: React.FC<ChatMessagesProps> = ({
   }, [messages.length, scrollToBottom]);
 
   if (!messages || messages.length === 0) {
-    return <div className={className}>{emptyStateComponent}</div>;
+    return (
+      <div
+        className={`w-full h-[70%] flex flex-col gap-2 justify-center text-center
+          font-serif text-6xl text-wrap ${className || ""} `}
+      >
+        {emptyStateComponent}
+        <p className="text-2xl" style={{ fontFamily: "楷体" }}>
+          阅尽好花千万树，愿君记取此一枝。
+        </p>
+      </div>
+    );
   }
 
   return (
