@@ -77,16 +77,28 @@ export const DeepResearchSearchProcessItem: React.FC<{
 };
 
 const DeepResearchProcess = () => {
-  const { isOpenProcessSider, researchTarget, tasks, report } =
-    useDeepResearchProcessStore();
+  const {
+    isOpenProcessSider,
+    researchTarget,
+    tasks,
+    report,
+    setIsOpenProcessSider,
+  } = useDeepResearchProcessStore();
   if (!isOpenProcessSider) return null;
 
   return (
-    <div className="h-screen w-6xl px-4 py-2 flex flex-col overflow-y-scroll relative border-l-2 border-[#f3f3f3]">
+    <div className="h-screen w-6xl px-4 flex flex-col overflow-y-scroll relative border-l-2 border-[#f3f3f3]">
       {/* header */}
-      <div className="w-full sticky flex justify-between items-center">
-        <div className="w-[70%]">{researchTarget}</div>
-        <Image src="/close.svg" width={30} height={30} alt="关闭"></Image>
+      <div className="w-full sticky top-0 flex justify-between items-center py-2 bg-white z-10">
+        <div className="w-[70%] text-2xl font-bold">课题：{researchTarget}</div>
+        <Image
+          className="cursor-pointer"
+          src="/close.svg"
+          width={30}
+          height={30}
+          alt="关闭"
+          onClick={() => setIsOpenProcessSider(false)}
+        />
       </div>
 
       {/* outline */}
@@ -128,6 +140,12 @@ const DeepResearchProcess = () => {
               isShow={index === 0 || tasks[index - 1].result !== ""}
             />
           ))}
+          {tasks.every((task) => task.result) && !report && (
+            <div className="w-full flex items-center mt-3">
+              <LoadingOutlined />
+              <Title title="正在生成最终报告"></Title>
+            </div>
+          )}
         </div>
       )}
 

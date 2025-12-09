@@ -161,7 +161,7 @@ async function simpleAnalyse(state: typeof StateAnnotation.State) {
 
   const systemPrompt = `
 你是一个任务分析助手，在简单分析用户问题之后，完成以下两个任务：
-1. 以深度研究助手的视角，在8个字以内生成一个研究目标
+1. 以深度研究助手的视角，在15个字以内生成一个研究目标
 2. 以深度研究助手的口吻，在50字以内生成一句开场白，格式为：“好的，下面我将研究……”，不展开具体分析。
 
 最终结果以：JSON格式
