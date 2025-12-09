@@ -37,18 +37,8 @@ const SessionBubble: React.FC<{
         "/conversations/get_current_messages",
         { sessionId }
       );
-      console.log(response.data);
-      const messages = response.data.map((msg: any) => {
-        return {
-          id: msg.id,
-          sessionId: msg.session_id,
-          role: msg.role,
-          content: msg.content,
-          mode: msg.mode,
-          researchStatus: msg.research_status,
-        } as ChatMessageType;
-      });
-      setCurrentMessages(messages);
+      // console.log(response.data);
+      setCurrentMessages(response.data);
     } catch (error) {
       console.error("error:", error);
     }

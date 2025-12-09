@@ -4,14 +4,11 @@ import { query } from "@/lib";
 export async function POST(request: NextRequest) {
   try {
     const requestBody = await request.json();
-    console.log("Received request body:", requestBody);
+    // console.log("Received request body:", requestBody);
 
     const { session_id, message_id } = requestBody;
-    console.log("Extracted session_id:", session_id);
-    console.log("Extracted message_id:", message_id);
 
     if (!session_id || !message_id) {
-      console.log("Missing required parameters");
       return NextResponse.json(
         { error: "session_id and message_id are required" },
         { status: 400 }

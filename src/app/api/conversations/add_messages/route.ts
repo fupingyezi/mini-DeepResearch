@@ -45,17 +45,14 @@ export async function POST(request: NextRequest) {
           message.mode || "chat",
           message.researchStatus || "failed",
         ];
-        // console.log(msgValues);
 
         await client.query(insertMsgQuery, msgValues);
-        console.log("message:", message);
 
         if (
           message.mode === "deepResearch" &&
           message.researchStatus === "finished"
         ) {
           const dr = message.deepResearchResult;
-          console.log("dr", dr);
 
           const cleanResearchTarget = (dr.researchTarget || "")
             .toString()
@@ -88,16 +85,17 @@ export async function POST(request: NextRequest) {
             const insertTaskQuery = `
               insert into research_task (
                 id,
+                task_id,
                 research_result_id,
                 description,
                 need_search,
                 result
-              ) values ($1, $2, $3, $4, $5);
+              ) values ($1, $2, $3, $4, $5, $6);
             `;
 
-            const taskUuid = task.taskId;
             await client.query(insertTaskQuery, [
-              taskUuid,
+              task.id,
+              task.taskId,
               researchResultId,
               cleanDescription,
               !!task.needSearch,
@@ -117,7 +115,7 @@ export async function POST(request: NextRequest) {
               `;
 
               await client.query(insertSRQuery, [
-                taskUuid, // 使用同样的 UUID
+                task.id,
                 sr.title || null,
                 sr.sourceUrl || null,
                 sr.content || null,

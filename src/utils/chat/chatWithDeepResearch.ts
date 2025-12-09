@@ -143,13 +143,13 @@ export const chatWithDeepResearch = async (
                 setStatus("processing");
               }
               if (data.type === "summary") {
-                accumulatedContent += data.payload;
-                const updateMessages = initialUpdateMessages.map((msg) =>
-                  msg.id === assistantMessageId
-                    ? { ...msg, content: accumulatedContent }
-                    : msg
-                );
-                setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
+                // accumulatedContent += data.payload;
+                // const updateMessages = initialUpdateMessages.map((msg) =>
+                //   msg.id === assistantMessageId
+                //     ? { ...msg, content: accumulatedContent }
+                //     : msg
+                // );
+                // setCurrentMessages(JSON.parse(JSON.stringify(updateMessages)));
                 updateReport(data.payload);
                 setStatus("end");
                 finalStatus = "finished";
@@ -196,7 +196,7 @@ export const chatWithDeepResearch = async (
 
     const tasksWithUuid = (currentState.tasks || []).map((task) => ({
       ...task,
-      taskId: task.taskId || uuidv4(),
+      id: uuidv4(),
     }));
 
     const deepResearchResult: deepResearchResultType = {
@@ -220,10 +220,10 @@ export const chatWithDeepResearch = async (
       } as ChatMessageType,
     ];
     try {
-      const response = await apiClient.post("/conversations/update_messages", {
+      const response = await apiClient.post("/conversations/add_messages", {
         chat_messages: new_Messages,
       });
-      // console.log("update_messages:", response);
+      // console.log("add_messages:", response);
     } catch (error) {
       console.log("error:", error);
       console.error("Failed to save messages:", error);

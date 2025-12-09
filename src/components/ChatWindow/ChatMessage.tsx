@@ -7,11 +7,7 @@ import { ChatMessagesProps, ChatMessageBubbleProps } from "@/types";
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import apiClient from "@/utils/request/api";
 import copy from "copy-to-clipboard";
-import {
-  useConversationStore,
-  useChatSelectStore,
-  useDeepResearchProcessStore,
-} from "@/store";
+import { useDeepResearchProcessStore } from "@/store";
 
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   const {
@@ -25,12 +21,6 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   const [isShowOtherOperators, setIsShowOtherOperators] =
     useState<boolean>(false);
   const [showCopySuccess, setShowCopySuccess] = useState<boolean>(false);
-  const renderContent = () => {
-    if (typeof message.content === "string") {
-      return message.content;
-    }
-    return JSON.stringify(message.content);
-  };
 
   useEffect(() => {
     if (showCopySuccess) {
@@ -41,6 +31,32 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
       return () => clearTimeout(timer);
     }
   }, [showCopySuccess]);
+
+  // 点击查看深度研究结果的处理逻辑
+  const hanldeShowDeepResearch = async () => {
+    if (status === "processing") return;
+    const response = await apiClient.post(
+      "/conversations/get_deep_research_result",
+      { session_id: message.sessionId, message_id: message.id }
+    );
+    const deepResearchResult = response.data;
+    if (!deepResearchResult) {
+      console.error("出错了，没有研究结果");
+      return;
+    }
+    setStatus("notCall");
+    setIsOpenProcessSider(true);
+    setResearchTargt(deepResearchResult.researchTarget || "");
+    setTasks(deepResearchResult.tasks || []);
+    updateReport(deepResearchResult.report);
+  };
+
+  const renderContent = () => {
+    if (typeof message.content === "string") {
+      return message.content;
+    }
+    return JSON.stringify(message.content);
+  };
 
   // 处理复制等其他操作
   const renderAdditionalOperator = (role: string) => {
@@ -104,27 +120,6 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
       </div>
     );
   };
-
-  // 点击查看深度研究结果的处理逻辑
-  const hanldeShowDeepResearch = async () => {
-    if (status === "processing") return;
-    const response = await apiClient.post(
-      "/conversations/get_deep_research_result",
-      { session_id: message.sessionId, message_id: message.id }
-    );
-    console.log("deepResearchResult:", response);
-    const deepResearchResult = response.data;
-    if (!deepResearchResult) {
-      console.error("出错了，没有研究结果");
-      return;
-    }
-    setStatus("notCall");
-    setIsOpenProcessSider(true);
-    setResearchTargt(deepResearchResult.researchTarget || "");
-    setTasks(deepResearchResult.tasks || []);
-    updateReport(deepResearchResult.report);
-  };
-
   // 深度研究状态显示框展示逻辑
   const renderShowDeepResearch = () => {
     if (
@@ -135,23 +130,26 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
       return null;
     }
 
+    // 历史已经完成的深度研究
     if (message.researchStatus === "finished") {
       return (
-        <Button
-          className="h-4 w-2xs rounded-2xl"
-          onClick={() => hanldeShowDeepResearch()}
-        >
-          <CheckCircleOutlined style={{ color: "green" }} />{" "}
-          深度研究完成,查看结果
-        </Button>
+        <>
+          <Button
+            className="h-4 w-2xs rounded-2xl"
+            onClick={() => hanldeShowDeepResearch()}
+          >
+            <CheckCircleOutlined style={{ color: "green" }} />{" "}
+            深度研究完成,查看研究过程
+          </Button>
+          <div>
+            <Markdown>{message.deepResearchResult?.report}</Markdown>
+          </div>
+        </>
       );
     }
 
-    if (
-      message.mode === "deepResearch" &&
-      message.role === "assistant" &&
-      status !== "notCall"
-    ) {
+    // 当前正在进行的深度研究
+    if (status !== "notCall") {
       return (
         <Button
           className="h-4 w-2xs rounded-2xl"
@@ -165,7 +163,8 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
           ) : (
             <>
               <CheckCircleOutlined style={{ color: "green" }} />{" "}
-              深度研究完成,查看结果
+              深度研究完成,查看研究过程
+              <Markdown>{message.deepResearchResult?.report}</Markdown>
             </>
           )}
         </Button>
@@ -173,7 +172,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
     }
   };
 
-  // user
+  // user气泡
   if (message.role === "user") {
     return (
       <div className="w-full px-3 mb-5 flex justify-end relative">
@@ -189,7 +188,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
     );
   }
 
-  // loading
+  // loading气泡
   if (
     message.role === "assistant" &&
     (message.content === "" ||
@@ -203,7 +202,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
     );
   }
 
-  // ai
+  // ai气泡
   return (
     <div className="w-full flex px-3 mb-5 justify-start flex-wrap relative">
       <div

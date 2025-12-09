@@ -47,9 +47,9 @@ const StateAnnotation = Annotation.Root({
   }),
   tasks: Annotation<taskType[]>({
     reducer: (old, update) => {
-      const map = new Map((old || []).map((t) => [t.id, t]));
+      const map = new Map((old || []).map((t) => [t.taskId, t]));
       for (const t of update || []) {
-        map.set(t.id, { ...map.get(t.id), ...t });
+        map.set(t.taskId, { ...map.get(t.taskId), ...t });
       }
       return Array.from(map.values());
     },
@@ -70,7 +70,7 @@ async function supervisor(state: typeof StateAnnotation.State) {
   const taskStatusSummary = state.tasks
     .map(
       (task) =>
-        `任务id, ${task.id}, 任务描述: ${task.description}, 任务状态: [${task.status}], 是否需要搜索: [${task.needSearch}]`
+        `任务id, ${task.taskId}, 任务描述: ${task.description}, 任务状态: [${task.status}], 是否需要搜索: [${task.needSearch}]`
     )
     .join("\n");
 
@@ -219,7 +219,7 @@ async function taskDecomposer(state: typeof StateAnnotation.State) {
   {
     "tasks": [
     {
-        "id": "唯一字符串标识（建议使用简短语义化ID，如 'step1_background'）",
+        "taskId": "唯一字符串标识（建议使用简短语义化ID，如 'step1_background'）",
         "description": "对该子任务的清晰、简洁描述，使用动宾结构（如“学习广义相对论基础”、“分析场方程的物理意义”）",
         "needSearch": true 或 false（若该任务需依赖互联网公开信息进行检索，则为 true；若仅依赖已有知识或逻辑推导，则为 false）
     },
@@ -253,7 +253,7 @@ async function taskDecomposer(state: typeof StateAnnotation.State) {
 
   if (parsedData && Array.isArray(parsedData.tasks)) {
     const tasks: taskType[] = parsedData.tasks.map(
-      (task: { id: string; description: string; needSearch: boolean }) => ({
+      (task: { taskId: string; description: string; needSearch: boolean }) => ({
         ...task,
         status: "pending",
         result: "",

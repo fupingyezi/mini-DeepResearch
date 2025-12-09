@@ -55,7 +55,7 @@ const useDeepResearchProcessStore = create<DeepResearchProcessState>()(
       }),
     updateTasks: (task: taskType) =>
       set((state) => {
-        const index = state.tasks.findIndex((t) => t.id === task.id);
+        const index = state.tasks.findIndex((t) => t.taskId === task.taskId);
         if (index !== -1) {
           state.tasks[index] = task;
         }

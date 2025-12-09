@@ -160,10 +160,10 @@ export const chatWithChatAssistant = async (
       },
     ];
     try {
-      const response = await apiClient.post("/conversations/update_messages", {
+      const response = await apiClient.post("/conversations/add_messages", {
         chat_messages: new_Messages,
       });
-      // console.log("update_messages:", response);
+      // console.log("add_messages:", response);
     } catch (error) {
       console.log("error:", error);
       console.error("Failed to save messages:", error);

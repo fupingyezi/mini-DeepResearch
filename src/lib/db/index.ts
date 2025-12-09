@@ -109,6 +109,7 @@ export async function initialDB() {
     await query(`
       create table if not exists research_task (
         id uuid primary key,
+        task_id text not null, 
         research_result_id integer not null references deep_research_result(id) on delete cascade,
         description text not null,
         need_search boolean default false,
