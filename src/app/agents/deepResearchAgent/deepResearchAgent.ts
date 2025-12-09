@@ -229,7 +229,9 @@ async function taskDecomposer(state: typeof StateAnnotation.State) {
 
   注意事项：
   子任务应按执行顺序排列，从基础准备到高阶分析；
+  生成的任务只负责收集最终生成报告必须的信息，不要生成关于总结生成报告之类的权限越界任务；
   避免过于宽泛或模糊的描述；
+  输出的子任务数为2~5个；
   仅输出符合上述格式的 JSON，不要包含任何额外文本、解释或注释。`;
 
   const agent = createAgent({
