@@ -12,6 +12,7 @@ import { useDeepResearchProcessStore } from "@/store";
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   const {
     status,
+    report,
     setStatus,
     setResearchTargt,
     setIsOpenProcessSider,
@@ -164,7 +165,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             <>
               <CheckCircleOutlined style={{ color: "green" }} />{" "}
               深度研究完成,查看研究过程
-              <Markdown>{message.deepResearchResult?.report}</Markdown>
+              <Markdown>{report}</Markdown>
             </>
           )}
         </Button>
@@ -206,7 +207,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
   return (
     <div className="w-full flex px-3 mb-5 justify-start flex-wrap relative">
       <div
-        className="max-w-2/3 p-3 rounded-3xl bg-white flex flex-col"
+        className="max-w-2/3 p-3 rounded-3xl bg-white flex flex-col gap-4"
         onMouseEnter={() => setIsShowOtherOperators(true)}
         onMouseLeave={() => setIsShowOtherOperators(false)}
       >

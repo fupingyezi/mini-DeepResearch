@@ -2,7 +2,6 @@
 
 import useDeepResearchProcessStore from "@/store/deepResearchProcessStore";
 import Markdown from "react-markdown";
-import { Spin } from "antd";
 import Image from "next/image";
 import { taskType } from "@/types";
 import {
@@ -90,7 +89,7 @@ const DeepResearchProcess = () => {
     <div className="h-screen w-6xl px-4 flex flex-col overflow-y-scroll relative border-l-2 border-[#f3f3f3]">
       {/* header */}
       <div className="w-full sticky top-0 flex justify-between items-center py-2 bg-white z-10">
-        <div className="w-[70%] text-2xl font-bold">课题：{researchTarget}</div>
+        <div className="w-[70%] text-xl font-bold">课题：{researchTarget}</div>
         <Image
           className="cursor-pointer"
           src="/close.svg"
