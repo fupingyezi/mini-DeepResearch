@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { Button, Spin, Tooltip, message as antdMessage } from "antd";
 import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
@@ -185,7 +187,12 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
           onMouseEnter={() => setIsShowOtherOperators(true)}
           onMouseLeave={() => setIsShowOtherOperators(false)}
         >
-          {renderContent()}
+          <Markdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+          >
+            {renderContent()}
+          </Markdown>
         </div>
         {renderAdditionalOperator(message.role)}
       </div>
@@ -214,7 +221,12 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
         onMouseEnter={() => setIsShowOtherOperators(true)}
         onMouseLeave={() => setIsShowOtherOperators(false)}
       >
-        <Markdown>{renderContent()}</Markdown>
+        <Markdown
+          remarkPlugins={[remarkGfm, remarkMath]}
+          rehypePlugins={[rehypeKatex]}
+        >
+          {renderContent()}
+        </Markdown>
         {renderShowDeepResearch()}
       </div>
       {renderAdditionalOperator(message.role)}

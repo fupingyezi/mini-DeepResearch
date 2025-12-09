@@ -1,28 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  ConvertRawMessagesToLangChainMessage,
-  ConvertLangChainMessageToRoleMessage,
-} from "@/utils";
+import { ConvertLangChainMessageToRoleMessage } from "@/utils";
 import { chatAgent, chatAgentStream } from "@/app/agents";
-import type { chunkMessageType, ChatMessageType } from "@/types";
+import type { chunkMessageType } from "@/types";
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, stream = false } = await request.json();
+    const { input, sessionId, stream = true } = await request.json();
 
-    if (!messages) {
-      return NextResponse.json(
-        { error: "Message is required" },
-        { status: 400 }
-      );
+    if (!input) {
+      return NextResponse.json({ error: "input is required" }, { status: 400 });
     }
 
-    const LangChainMessages = messages.map((msg: ChatMessageType) =>
-      ConvertRawMessagesToLangChainMessage(msg)
-    );
-
     if (!stream) {
-      const response = await chatAgent(LangChainMessages);
+      const response = await chatAgent(input, sessionId);
       return NextResponse.json(
         {
           messages: response.messages.map((msg) =>
@@ -47,7 +37,8 @@ export async function POST(request: NextRequest) {
 
         try {
           for await (const chunk of chatAgentStream(
-            LangChainMessages,
+            input,
+            sessionId,
             "messages"
           )) {
             const data: chunkMessageType = {
