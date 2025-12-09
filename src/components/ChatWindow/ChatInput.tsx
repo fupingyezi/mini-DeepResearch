@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ChatInputProps } from "@/types";
+import { agentMode, useChatSelectStore } from "@/store";
 
 const ChatInput: React.FC<ChatInputProps> = ({
   placeholder,
@@ -8,6 +9,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   disabled = false,
   className,
 }) => {
+  const { selectedAgent, setSelectedAgent } = useChatSelectStore();
   const [inputValue, setInputValue] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,6 +24,14 @@ const ChatInput: React.FC<ChatInputProps> = ({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
+    }
+  };
+
+  const hanleSelect = (agent: agentMode) => {
+    if (selectedAgent === agent) {
+      setSelectedAgent("chat");
+    } else {
+      setSelectedAgent(agent);
     }
   };
 
@@ -51,13 +61,36 @@ const ChatInput: React.FC<ChatInputProps> = ({
         }}
       />
       <div className="flex w-full justify-between px-2">
-        <Image
-          src="/add.svg"
-          alt="添加附件"
-          width={30}
-          height={30}
-          className="p-2 w-10 h-10 rounded-3xl hover:bg-[#e7e7e7] hover:cursor-pointer"
-        ></Image>
+        <div className="flex items-center gap-2">
+          <Image
+            src="/add.svg"
+            alt="添加附件"
+            width={30}
+            height={30}
+            className="p-2 w-10 h-8 rounded-3xl hover:bg-[#e7e7e7] hover:cursor-pointer"
+          ></Image>
+          <div
+            className="w-30 h-8 rounded-2xl border-[#f3f3f3] border-2 flex justify-center items-center hover:cursor-pointer hover:bg-[#e7e7e7]"
+            onClick={() => hanleSelect("search")}
+            style={{
+              backgroundColor: selectedAgent === "search" ? "#eceaff" : "",
+              color: selectedAgent === "search" ? "#4433ff" : "",
+            }}
+          >
+            联网搜索
+          </div>
+          <div
+            className="w-30 h-8 rounded-2xl border-[#f3f3f3] border-2 flex justify-center items-center hover:cursor-pointer hover:bg-[#e7e7e7]"
+            onClick={() => hanleSelect("deepResearch")}
+            style={{
+              backgroundColor:
+                selectedAgent === "deepResearch" ? "#eceaff" : "",
+              color: selectedAgent === "deepResearch" ? "#4433ff" : "",
+            }}
+          >
+            深度研究
+          </div>
+        </div>
         <button
           type="submit"
           disabled={!inputValue.trim() || disabled}

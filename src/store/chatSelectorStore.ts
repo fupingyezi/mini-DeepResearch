@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
-type agentMode = "chat" | "search" | "deepResearch";
+export type agentMode = "chat" | "search" | "deepResearch";
 
 export interface ChatSelectState {
-  selectedAgent: string;
-  setSelectedAgent: (selectedAgent: string) => void;
+  selectedAgent: agentMode;
+  setSelectedAgent: (selectedAgent: agentMode) => void;
 }
 
 const useChatSelectStore = create<ChatSelectState>((set) => ({
-  selectedAgent: "deepResearch",
-  setSelectedAgent: (selectedAgent: string) =>
+  selectedAgent: "chat",
+  setSelectedAgent: (selectedAgent: agentMode) =>
     set(() => ({
       selectedAgent: selectedAgent,
     })),

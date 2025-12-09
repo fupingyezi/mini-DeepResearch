@@ -4,7 +4,7 @@ import useChatSelectStore from "./chatSelectorStore";
 
 import type { ConversationState } from "./conversationStore";
 import type { DeepResearchProcessState } from "./deepResearchProcessStore";
-import type { ChatSelectState } from "./chatSelectorStore";
+import type { ChatSelectState, agentMode } from "./chatSelectorStore";
 
 export {
   useConversationStore,
@@ -12,4 +12,9 @@ export {
   useChatSelectStore,
 };
 
-export { ConversationState, DeepResearchProcessState, ChatSelectState };
+export {
+  ConversationState,
+  DeepResearchProcessState,
+  ChatSelectState,
+  agentMode,
+};

@@ -4,7 +4,11 @@ import { ChatLayoutProps, ChatWindowProps } from "@/types";
 import React, { useCallback } from "react";
 import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
-import { useConversationStore, useDeepResearchProcessStore } from "@/store";
+import {
+  useConversationStore,
+  useDeepResearchProcessStore,
+  useChatSelectStore,
+} from "@/store";
 import { chatWithChatAssistant, chatWithDeepResearch } from "@/utils/chat";
 
 const ChatLayout: React.FC<ChatLayoutProps> = ({ content, footer }) => {
@@ -23,6 +27,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const conversationStore = useConversationStore();
   const deepResearchStore = useDeepResearchProcessStore();
+  const { selectedAgent } = useChatSelectStore();
 
   const { isLoading, shouldAutoScroll, currentMessages, setShouldAutoScroll } =
     conversationStore;
@@ -36,11 +41,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const handleSendMessage = useCallback(
     async (inputValue: string) => {
-      await chatWithDeepResearch({
-        inputValue,
-        ...conversationStore,
-        ...deepResearchStore,
-      });
+      if (selectedAgent === "chat") {
+        await chatWithChatAssistant({
+          inputValue,
+          ...conversationStore,
+        });
+      } else if (selectedAgent === "search") {
+      } else if (selectedAgent === "deepResearch") {
+        await chatWithDeepResearch({
+          inputValue,
+          ...conversationStore,
+          ...deepResearchStore,
+        });
+      }
     },
     [conversationStore, deepResearchStore]
   );
