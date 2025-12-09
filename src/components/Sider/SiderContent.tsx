@@ -28,7 +28,7 @@ const SessionBubble: React.FC<{
   const date = new Date(chatSession.updated_at);
   const showDate = `${date.getFullYear()}-${
     date.getMonth() + 1
-  }-${date.getDay()}`;
+  }-${date.getDate()}`;
 
   const handleSelectSession = async (sessionId: UUIDTypes) => {
     setCurrentSession(sessionId);
@@ -93,11 +93,15 @@ const SiderContent = () => {
 
   const checkDifferentDay = (session: ChatSessionType, index: number) => {
     const date = new Date(session.updated_at);
-    const showDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
+    const showDate = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`;
     let lastDate;
     if (index > 0) {
       const date = new Date(chatSessions[index - 1].updated_at);
-      lastDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}`;
+      lastDate = `${date.getFullYear()}-${
+        date.getMonth() + 1
+      }-${date.getDate()}`;
     }
 
     return index === 0 || showDate !== lastDate;
