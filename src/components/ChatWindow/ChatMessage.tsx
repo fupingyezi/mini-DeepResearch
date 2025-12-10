@@ -1,8 +1,5 @@
 import Image from "next/image";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
+import CustomMarkdown from "../Markdown/CustomMarkdown";
 import { Button, Spin, Tooltip, message as antdMessage } from "antd";
 import { LoadingOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
@@ -146,12 +143,9 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             深度研究完成,查看研究过程
           </Button>
           <div>
-            <Markdown
-              remarkPlugins={[remarkGfm, remarkMath]}
-              rehypePlugins={[rehypeKatex]}
-            >
-              {message.deepResearchResult?.report}
-            </Markdown>
+            <CustomMarkdown
+              content={message.deepResearchResult?.report || ""}
+            />
           </div>
         </>
       );
@@ -173,12 +167,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             <>
               <CheckCircleOutlined style={{ color: "green" }} />{" "}
               深度研究完成,查看研究过程
-              <Markdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                rehypePlugins={[rehypeKatex]}
-              >
-                {report}
-              </Markdown>
+              <CustomMarkdown content={report} />
             </>
           )}
         </Button>
@@ -195,12 +184,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
           onMouseEnter={() => setIsShowOtherOperators(true)}
           onMouseLeave={() => setIsShowOtherOperators(false)}
         >
-          <Markdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-          >
-            {renderContent()}
-          </Markdown>
+          <CustomMarkdown content={renderContent()} />
         </div>
         {renderAdditionalOperator(message.role)}
       </div>
@@ -229,12 +213,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
         onMouseEnter={() => setIsShowOtherOperators(true)}
         onMouseLeave={() => setIsShowOtherOperators(false)}
       >
-        <Markdown
-          remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeKatex]}
-        >
-          {renderContent()}
-        </Markdown>
+        <CustomMarkdown content={renderContent()} />
         {renderShowDeepResearch()}
       </div>
       {renderAdditionalOperator(message.role)}

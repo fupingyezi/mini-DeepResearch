@@ -1,10 +1,7 @@
 "use client";
 
 import useDeepResearchProcessStore from "@/store/deepResearchProcessStore";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
+import CustomMarkdown from "../Markdown/CustomMarkdown";
 import Image from "next/image";
 import { taskType } from "@/types";
 import {
@@ -42,12 +39,7 @@ export const DeepResearchSearchProcessItem: React.FC<{
         <Title title={task.description} />
       </div>
       <div className="pl-6 mt-4">
-        <Markdown
-          remarkPlugins={[remarkGfm, remarkMath]}
-          rehypePlugins={[rehypeKatex]}
-        >
-          {task.result}
-        </Markdown>
+        <CustomMarkdown content={task.result || ""} />
         <div className="bg-[#f4f4f4] rounded-xl p-3 mt-2">
           {task.searchResult && task.searchResult.length > 0 ? (
             <ul className="space-y-1.?('text-xs') text-gray-700  list-none">
@@ -160,12 +152,7 @@ const DeepResearchProcess = () => {
       {report && (
         <div className="w-full flex flex-col gap-3 border-t-2 border-[#f4f4f4] py-4">
           <Title title="最终报告结果" className="font-bold text-2xl"></Title>
-          <Markdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-          >
-            {report}
-          </Markdown>
+          <CustomMarkdown content={report} />
         </div>
       )}
     </div>
