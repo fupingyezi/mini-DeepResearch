@@ -146,7 +146,10 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             深度研究完成,查看研究过程
           </Button>
           <div>
-            <Markdown remarkPlugins={[remarkGfm]}>
+            <Markdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+            >
               {message.deepResearchResult?.report}
             </Markdown>
           </div>
@@ -170,7 +173,12 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             <>
               <CheckCircleOutlined style={{ color: "green" }} />{" "}
               深度研究完成,查看研究过程
-              <Markdown>{report}</Markdown>
+              <Markdown
+                remarkPlugins={[remarkGfm, remarkMath]}
+                rehypePlugins={[rehypeKatex]}
+              >
+                {report}
+              </Markdown>
             </>
           )}
         </Button>

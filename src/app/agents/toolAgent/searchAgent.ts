@@ -36,7 +36,7 @@ const searchWebTool = tool(
 );
 
 export const ChatAgentWithSearchTool = async (
-  messages: BaseMessage[],
+  input: string,
   config?: Record<string, any>
 ) => {
   const model = new ChatOpenAI({
@@ -59,7 +59,7 @@ export const ChatAgentWithSearchTool = async (
   try {
     const response = await agent.invoke(
       {
-        messages: messages,
+        messages: [{ role: "human", content: input }],
       },
       {
         ...config,

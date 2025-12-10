@@ -1,25 +1,19 @@
 import { ChatAgentWithSearchTool } from "@/app/agents";
 import { NextRequest, NextResponse } from "next/server";
-import {
-  ConvertRawMessagesToLangChainMessage,
-  ConvertLangChainMessageToRoleMessage,
-} from "@/utils";
+import { ConvertLangChainMessageToRoleMessage } from "@/utils";
 import { ChatMessageType } from "@/types";
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, stream = false } = await request.json();
-    console.log("messages", messages);
+    const { input, sessionId, stream = true } = await request.json();
 
-    if (!messages) {
-      return NextResponse.json({ error: "Messages is empty" }, { status: 400 });
+    if (!input) {
+      return NextResponse.json({ error: "input is empty" }, { status: 400 });
     }
 
-    const LangChainMessages = messages.map((msg: ChatMessageType) =>
-      ConvertRawMessagesToLangChainMessage(msg)
-    );
-
-    const response = await ChatAgentWithSearchTool(LangChainMessages);
+    const response = await ChatAgentWithSearchTool(input, {
+      configuration: { thread_id: sessionId },
+    });
 
     if (!stream) {
       return NextResponse.json(

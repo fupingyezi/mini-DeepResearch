@@ -9,7 +9,11 @@ import {
   useDeepResearchProcessStore,
   useChatSelectStore,
 } from "@/store";
-import { chatWithChatAssistant, chatWithDeepResearch } from "@/utils/chat";
+import {
+  chatWithChatAssistant,
+  chatWithDeepResearch,
+  chatWithSearhAssistant,
+} from "@/utils/chat";
 
 const ChatLayout: React.FC<ChatLayoutProps> = ({ content, footer }) => {
   return (
@@ -47,6 +51,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           ...conversationStore,
         });
       } else if (selectedAgent === "search") {
+        await chatWithSearhAssistant({
+          inputValue,
+          ...conversationStore,
+        });
       } else if (selectedAgent === "deepResearch") {
         await chatWithDeepResearch({
           inputValue,
