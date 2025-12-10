@@ -16,7 +16,7 @@ export const chatWithChatAssistant = async (
     currentMessages,
     setIsLoading,
     setShouldAutoScroll,
-    updateChatSessions,
+    addChatSession,
     setCurrentSession,
     setCurrentMessages,
   } = chatWithChatAssistantParams;
@@ -41,7 +41,7 @@ export const chatWithChatAssistant = async (
       });
       // console.log("Session created:", res);
       if (res.success) {
-        updateChatSessions(chat_session);
+        addChatSession(chat_session);
         setCurrentSession(chat_session.id);
       }
     } catch (error) {

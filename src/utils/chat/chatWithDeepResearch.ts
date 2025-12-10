@@ -20,7 +20,7 @@ export const chatWithDeepResearch = async (
     currentMessages,
     setIsLoading,
     setShouldAutoScroll,
-    updateChatSessions,
+    addChatSession,
     setCurrentSession,
     setCurrentMessages,
     setResearchTargt,
@@ -51,7 +51,7 @@ export const chatWithDeepResearch = async (
       });
       // console.log("Session created:", res);
       if (res.success) {
-        updateChatSessions(chat_session);
+        addChatSession(chat_session);
         setCurrentSession(chat_session.id);
       }
     } catch (error) {
