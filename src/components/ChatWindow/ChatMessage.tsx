@@ -142,10 +142,27 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
             <CheckCircleOutlined style={{ color: "green" }} />{" "}
             深度研究完成,查看研究过程
           </Button>
-          <div>
-            <CustomMarkdown
-              content={message.deepResearchResult?.report || ""}
-            />
+          <div className="mt-4 p-6 border-2 border-gray-200 rounded-md bg-white relative">
+            <div className="text-gray-800 leading-relaxed">
+              <CustomMarkdown
+                content={message.deepResearchResult?.report.slice(0, 300) || ""}
+              />
+            </div>
+            <div
+              onClick={() => hanldeShowDeepResearch()}
+              className="h-1/2 w-full absolute left-0 bottom-0 z-10 flex items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(255, 255, 255, 1), transparent)",
+              }}
+            >
+              <Button
+                className="h-6 w-30 rounded-2xl"
+                onClick={() => hanldeShowDeepResearch()}
+              >
+                展开文档
+              </Button>
+            </div>
           </div>
         </>
       );
@@ -154,23 +171,46 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message }) => {
     // 当前正在进行的深度研究
     if (status !== "notCall") {
       return (
-        <Button
-          className="h-4 w-2xs rounded-2xl"
-          onClick={() => hanldeShowDeepResearch()}
-        >
-          {status === "processing" ? (
-            <>
-              <LoadingOutlined />
-              正在进行深度研究
-            </>
-          ) : (
-            <>
-              <CheckCircleOutlined style={{ color: "green" }} />{" "}
-              深度研究完成,查看研究过程
-              <CustomMarkdown content={report} />
-            </>
+        <>
+          <Button
+            className="h-4 w-2xs rounded-2xl"
+            onClick={() => hanldeShowDeepResearch()}
+          >
+            {status === "processing" ? (
+              <>
+                <LoadingOutlined />
+                正在进行深度研究
+              </>
+            ) : (
+              <>
+                <CheckCircleOutlined style={{ color: "green" }} />{" "}
+                深度研究完成,查看研究过程
+              </>
+            )}
+          </Button>
+          {status === "end" && report && (
+            <div className="mt-4 p-6 border-2 border-gray-200 rounded-md bg-white relative">
+              <div className="text-gray-800 leading-relaxed">
+                <CustomMarkdown content={report.slice(0, 300) || ""} />
+              </div>
+              <div
+                onClick={() => hanldeShowDeepResearch()}
+                className="h-1/2 w-full absolute left-0 bottom-0 z-10 flex items-center justify-center"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(255, 255, 255, 1), transparent)",
+                }}
+              >
+                <Button
+                  className="h-6 w-30 rounded-2xl"
+                  onClick={() => hanldeShowDeepResearch()}
+                >
+                  展开文档
+                </Button>
+              </div>
+            </div>
           )}
-        </Button>
+        </>
       );
     }
   };
