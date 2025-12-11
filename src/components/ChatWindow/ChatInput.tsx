@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ChatInputProps } from "@/types";
-import { agentMode, useChatSelectStore } from "@/store";
+import { agentMode, useChatSelectStore, useConversationStore } from "@/store";
 
 const ChatInput: React.FC<ChatInputProps> = ({
   placeholder,
@@ -9,11 +9,20 @@ const ChatInput: React.FC<ChatInputProps> = ({
   disabled = false,
   className,
 }) => {
+  const { isChating, currentAbortController, abortCurrentChat } =
+    useConversationStore();
   const { selectedAgent, setSelectedAgent } = useChatSelectStore();
   const [inputValue, setInputValue] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isChating) {
+      if (currentAbortController) {
+        abortCurrentChat();
+      }
+      return;
+    }
+
     if (inputValue.trim() && onSend && !disabled) {
       onSend(inputValue.trim());
       setInputValue("");
@@ -21,13 +30,16 @@ const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (isChating) return;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
     }
   };
 
-  const hanleSelect = (agent: agentMode) => {
+  const hanleSelect = (e: any, agent: agentMode) => {
+    e.stopPropagation();
+    console.log("select agent:", agent);
     if (selectedAgent === agent) {
       setSelectedAgent("chat");
     } else {
@@ -71,7 +83,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           ></Image>
           <div
             className="w-30 h-8 rounded-2xl border-[#f3f3f3] border-2 flex justify-center items-center hover:cursor-pointer hover:bg-[#e7e7e7]"
-            onClick={() => hanleSelect("search")}
+            onClick={(e) => hanleSelect(e, "search")}
             style={{
               backgroundColor: selectedAgent === "search" ? "#eceaff" : "",
               color: selectedAgent === "search" ? "#4433ff" : "",
@@ -81,7 +93,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </div>
           <div
             className="w-30 h-8 rounded-2xl border-[#f3f3f3] border-2 flex justify-center items-center hover:cursor-pointer hover:bg-[#e7e7e7]"
-            onClick={() => hanleSelect("deepResearch")}
+            onClick={(e) => hanleSelect(e, "deepResearch")}
             style={{
               backgroundColor:
                 selectedAgent === "deepResearch" ? "#eceaff" : "",
@@ -93,14 +105,15 @@ const ChatInput: React.FC<ChatInputProps> = ({
         </div>
         <button
           type="submit"
-          disabled={!inputValue.trim() || disabled}
-          className={`p-2 rounded-[50%]  ${
-            !disabled
-              ? "bg-black hover:cursor-pointer"
-              : "bg-[#aeabab] hover:cursor-not-allowed"
-          }`}
+          className={`p-2 rounded-[50%] bg-black hover:cursor-pointer`}
         >
-          <Image src="/send.svg" alt="发送" width={25} height={25}></Image>
+          {isChating ? (
+            <div className="w-6 h-6 flex items-center justify-center">
+              <div className="w-3.5 h-3.5 bg-white rounded-xs"></div>
+            </div>
+          ) : (
+            <Image src="/send.svg" alt="发送" width={25} height={25}></Image>
+          )}
         </button>
       </div>
     </form>

@@ -1,14 +1,16 @@
 import { create } from "zustand";
 import type { ChatMessageType, ChatSessionType } from "@/types";
 import { UUIDTypes } from "uuid";
+import { abort } from "process";
 
 export interface ConversationState {
-  isLoading: boolean;
+  isChating: boolean;
   shouldAutoScroll: boolean;
   chatSessions: ChatSessionType[];
   currentSession: UUIDTypes;
   currentMessages: ChatMessageType[];
-  setIsLoading: (isLoading: boolean) => void;
+  currentAbortController: AbortController | null;
+  setIsChating: (isChating: boolean) => void;
   setShouldAutoScroll: (shouldAutoScroll: boolean) => void;
   intialChatSessions: (chatSessions: ChatSessionType[]) => void;
   addChatSession: (chatSession: ChatSessionType) => void;
@@ -21,17 +23,20 @@ export interface ConversationState {
   updateCurrentMessages: (
     ChatMessages: ChatMessageType | ChatMessageType[]
   ) => void;
+  setAbortController: (controller: AbortController | null) => void;
+  abortCurrentChat: () => void;
 }
 
 const useConversationStore = create<ConversationState>((set) => ({
-  isLoading: false,
+  isChating: false,
   shouldAutoScroll: false,
   chatSessions: [],
   currentSession: "",
   currentMessages: [],
-  setIsLoading: (isLoading) =>
+  currentAbortController: null,
+  setIsChating: (isChating) =>
     set(() => ({
-      isLoading: isLoading,
+      isChating: isChating,
     })),
   setShouldAutoScroll: (shouldAutoScroll) =>
     set(() => ({
@@ -94,6 +99,16 @@ const useConversationStore = create<ConversationState>((set) => ({
           currentMessages: [...state.currentMessages, chatMessages],
         };
       }
+    }),
+  setAbortController: (abortController) =>
+    set(() => ({ currentAbortController: abortController })),
+  abortCurrentChat: () =>
+    set((state) => {
+      if (state.currentAbortController) {
+        state.currentAbortController.abort();
+        return { currentAbortController: null, isChating: false };
+      }
+      return {};
     }),
 }));
 

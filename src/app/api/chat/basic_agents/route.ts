@@ -24,18 +24,44 @@ export async function POST(request: NextRequest) {
     }
 
     const encoder = new TextEncoder();
+
     const readabelStrem = new ReadableStream({
       async start(controller) {
-        controller.enqueue(
-          encoder.encode(
-            `data: ${JSON.stringify({
-              type: "start",
-              timeStamp: Date.now(),
-            })}\n\n`
-          )
-        );
+        let streamAborted = false;
+
+        const cleanup = () => {
+          streamAborted = true;
+        };
+
+        request.signal?.addEventListener("abort", cleanup);
+
+        const checkSafeEnqueue = (data: Uint8Array) => {
+          if (streamAborted) return false;
+
+          try {
+            controller.enqueue(data);
+            return true;
+          } catch (error) {
+            console.error("controller enqueue failed", error);
+            streamAborted = true;
+            return false;
+          }
+        };
 
         try {
+          if (
+            !checkSafeEnqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: "start",
+                  timeStamp: Date.now(),
+                })}\n\n`
+              )
+            )
+          ) {
+            return;
+          }
+
           for await (const chunk of chatAgentStream(
             input,
             sessionId,
@@ -49,28 +75,49 @@ export async function POST(request: NextRequest) {
               done: false,
             };
 
-            const sseData = `data: ${JSON.stringify(data)}\n\n`;
-            controller.enqueue(encoder.encode(sseData));
+            if (
+              !checkSafeEnqueue(
+                encoder.encode(`data: ${JSON.stringify(data)}\n\n`)
+              )
+            ) {
+              break;
+            }
           }
 
-          const endData: chunkMessageType = {
-            type: "done",
-            done: true,
-          };
-          const sseEnd = `data: ${JSON.stringify(endData)}\n\n`;
-          controller.enqueue(encoder.encode(sseEnd));
+          if (!streamAborted) {
+            checkSafeEnqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: "done",
+                  done: true,
+                })}\n\n`
+              )
+            );
+          }
         } catch (error) {
           console.error("Stream error:", error);
-          const errorData = {
-            type: "error",
-            content: "Stream error occurred",
-            done: true,
-          };
-          const sseError = `data: ${JSON.stringify(errorData)}\n\n`;
-          controller.enqueue(encoder.encode(sseError));
+
+          if (!streamAborted) {
+            checkSafeEnqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({
+                  type: "error",
+                  content: "Stream error occurred",
+                  done: true,
+                })}\n\n`
+              )
+            );
+          }
         } finally {
+          if (request.signal) {
+            request.signal.removeEventListener("abort", cleanup);
+          }
           controller.close();
         }
+      },
+
+      cancel() {
+        console.log("ReadableStream cancelled by client");
       },
     });
 

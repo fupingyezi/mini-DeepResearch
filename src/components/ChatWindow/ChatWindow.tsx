@@ -31,9 +31,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const conversationStore = useConversationStore();
   const deepResearchStore = useDeepResearchProcessStore();
-  const { selectedAgent } = useChatSelectStore();
 
-  const { isLoading, shouldAutoScroll, currentMessages, setShouldAutoScroll } =
+  const { isChating, shouldAutoScroll, currentMessages, setShouldAutoScroll } =
     conversationStore;
 
   const handleChangeScroll = useCallback(
@@ -45,6 +44,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
   const handleSendMessage = useCallback(
     async (inputValue: string) => {
+      const { selectedAgent } = useChatSelectStore.getState();
       if (selectedAgent === "chat") {
         await chatWithChatAssistant({
           inputValue,
@@ -81,7 +81,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         <ChatInput
           placeholder={placeholder}
           onSend={handleSendMessage}
-          disabled={isLoading}
+          disabled={isChating}
         />
       }
     />
